@@ -42,5 +42,5 @@ let currentState: GameState = GameState.Ready;
     }
   };
 
-  switchState(GameState.Playing);
+  switchState(GameState.Ready);
 })();
