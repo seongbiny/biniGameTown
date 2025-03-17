@@ -1,0 +1,10 @@
+{
+  "name": "biniPuzzle",
+  "packageManager": "yarn@4.7.0",
+  "dependencies": {
+    "pixi.js": "^8.8.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.2"
+  }
+}
