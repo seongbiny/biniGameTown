@@ -1096,15 +1096,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"biniPuzzle@workspace:packages/biniPuzzle":
-  version: 0.0.0-use.local
-  resolution: "biniPuzzle@workspace:packages/biniPuzzle"
-  dependencies:
-    pixi.js: "npm:^8.8.1"
-    typescript: "npm:^5.8.2"
-  languageName: unknown
-  linkType: soft
-
 "brace-expansion@npm:^1.1.7":
   version: 1.1.11
   resolution: "brace-expansion@npm:1.1.11"
@@ -1697,6 +1688,16 @@ __metadata:
   conditions: os=darwin
   languageName: node
   linkType: hard
+
+"game@workspace:packages/game":
+  version: 0.0.0-use.local
+  resolution: "game@workspace:packages/game"
+  dependencies:
+    pixi.js: "npm:^8.8.1"
+    typescript: "npm:~5.7.2"
+    vite: "npm:^6.2.0"
+  languageName: unknown
+  linkType: soft
 
 "gensync@npm:^1.0.0-beta.2":
   version: 1.0.0-beta.2
