@@ -1,0 +1,4 @@
+export const DEFAULT_CONFIG = {
+  GAME_WIDTH: 450,
+  GAME_HEIGHT: 800,
+};

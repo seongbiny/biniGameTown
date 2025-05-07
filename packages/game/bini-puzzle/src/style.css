@@ -1,0 +1,21 @@
+body {
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  /* background-color: #000; 선택사항: 캔버스 주변 배경색 */
+  font-family: 'Pixelify Sans', cursive;
+}
+
+#app-canvas {
+  position: relative; /* absolute에서 relative로 변경 */
+}
+
+@font-face {
+  font-family: 'Pixelify Sans';
+  src: url('/assets/fonts/PixelifySans.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}

@@ -1,0 +1,22 @@
+{
+  "name": "@bini-game-town/flappy-plane",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build:flappy": "tsc && vite build"
+  },
+  "devDependencies": {
+    "@types/matter-js": "^0.19.8",
+    "@types/node": "^22.14.0",
+    "eslint": "^9.23.0",
+    "typescript": "~5.7.2",
+    "vite": "^6.2.0"
+  },
+  "dependencies": {
+    "lottie-web": "^5.12.2",
+    "matter-js": "^0.20.0",
+    "pixi.js": "^8.9.1"
+  }
+}

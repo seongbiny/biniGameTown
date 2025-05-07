@@ -1,0 +1,12 @@
+@font-face {
+  font-family: 'Chicalo';
+  src: url('/assets/fonts/Chicalo.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* 모든 텍스트 요소에 기본 폰트로 Chicalo 적용 */
+* {
+  font-family: 'Chicalo', sans-serif;
+}
