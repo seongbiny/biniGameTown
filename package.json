@@ -12,12 +12,14 @@
     "packages/game/*"
   ],
   "scripts": {
-    "dev:web": "yarn build:games && yarn workspace @bini-game-town/web dev",
+    "dev": "yarn workspace @bini-game-town/web dev",
+    "build": "yarn build:games && yarn build:web",
+    "build:games": "yarn build:puzzle && yarn build:flappy",
     "build:web": "yarn workspace @bini-game-town/web build",
-    "build:puzzle": "yarn workspace @bini-game-town/bini-puzzle build:puzzle",
-    "build:flappy": "yarn workspace @bini-game-town/flappy-plane build:flappy",
-    "build:games": "yarn workspaces foreach -p --include \"@bini-game-town/game-*\" run build",
-    "build": "yarn build:games && yarn build:web"
+    "build:puzzle": "yarn workspace @bini-game-town/bini-puzzle build",
+    "build:flappy": "yarn workspace @bini-game-town/flappy-plane build",
+    "preview": "yarn workspace @bini-game-town/web preview",
+    "lint": "yarn workspaces foreach -p run lint"
   },
   "devDependencies": {
     "typescript": "^5.8.2"

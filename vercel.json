@@ -1,4 +1,5 @@
 {
+  "framework": "vite",
   "buildCommand": "yarn build",
   "outputDirectory": "packages/web/dist",
   "installCommand": "yarn install",

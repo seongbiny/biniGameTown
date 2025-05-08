@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build:flappy": "tsc && vite build"
+    "build": "tsc && vite build",
+    "lint": "eslint ."
   },
   "devDependencies": {
     "@types/matter-js": "^0.19.8",
