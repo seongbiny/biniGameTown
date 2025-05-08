@@ -1,0 +1,9 @@
+{
+  "buildCommand": "yarn build",
+  "outputDirectory": "packages/web/dist",
+  "installCommand": "yarn install",
+  "rewrites": [
+    { "source": "/game/:path*", "destination": "/game/:path*" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}

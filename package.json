@@ -16,9 +16,8 @@
     "build:web": "yarn workspace @bini-game-town/web build",
     "build:puzzle": "yarn workspace @bini-game-town/bini-puzzle build:puzzle",
     "build:flappy": "yarn workspace @bini-game-town/flappy-plane build:flappy",
-    "build:games": "yarn build:puzzle && yarn build:flappy",
-    "build:all": "yarn workspaces foreach -pt run build",
-    "dev:game:puzzle": "yarn workspace @bini-game-town/puzzle dev"
+    "build:games": "yarn workspaces foreach -p --include \"@bini-game-town/game-*\" run build",
+    "build": "yarn build:games && yarn build:web"
   },
   "devDependencies": {
     "typescript": "^5.8.2"
