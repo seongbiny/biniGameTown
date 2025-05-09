@@ -1,6 +1,6 @@
 {
-  "buildCommand": "cd packages/game/bini-puzzle && yarn build && cd ../flappy-plane && yarn build && cd ../../web && yarn build",
-  "outputDirectory": "dist",
+  "buildCommand": "ls -la && find . -type d | sort && cd packages/web && yarn build",
+  "outputDirectory": "packages/web/dist",
   "installCommand": "yarn install",
   "rewrites": [
     { "source": "/game/:path*", "destination": "/game/:path*" },
