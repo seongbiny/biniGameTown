@@ -6,5 +6,6 @@
   "rewrites": [
     { "source": "/game/:path*", "destination": "/game/:path*" },
     { "source": "/(.*)", "destination": "/index.html" }
-  ]
+  ],
+  "ignoreCommand": "tsc -p tsconfig.json"
 }
