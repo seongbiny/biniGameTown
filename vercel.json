@@ -1,6 +1,5 @@
 {
-  "framework": "vite",
-  "buildCommand": "yarn build",
+  "buildCommand": "cd packages/web && yarn build && cd ../game/bini-puzzle && yarn build && cd ../flappy-plane && yarn build",
   "outputDirectory": "packages/web/dist",
   "installCommand": "yarn install",
   "rewrites": [
