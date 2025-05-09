@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "build": "vite build"
+    "build": "echo '게임 공통 설정 - 개별 게임 빌드는 각 폴더에서 실행됩니다'"
   },
   "devDependencies": {
     "typescript": "~5.7.2",

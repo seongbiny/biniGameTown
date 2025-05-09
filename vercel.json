@@ -1,5 +1,5 @@
 {
-  "buildCommand": "ls -la && pwd && cd packages/game/bini-puzzle && yarn build && cd ../flappy-plane && yarn build && cd ../../web && yarn build",
+  "buildCommand": "yarn build",
   "outputDirectory": "dist",
   "installCommand": "yarn install",
   "rewrites": [

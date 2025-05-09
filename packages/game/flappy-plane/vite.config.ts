@@ -6,7 +6,7 @@ export default defineConfig({
   assetsInclude: ["**/*.otf", "**/*.ttf"],
   build: {
     assetsInlineLimit: 0, // 폰트 같은 큰 파일은 인라인화하지 않음
-    outDir: "../../dist/game/flappy-plane",
+    outDir: "../../../dist/game/flappy-plane",
     emptyOutDir: true,
   },
   base: "/game/flappy-plane/",

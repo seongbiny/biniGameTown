@@ -13,7 +13,7 @@
   ],
   "scripts": {
     "dev": "yarn workspace @bini-game-town/web dev",
-    "build": "mkdir -p dist && cd packages/game/bini-puzzle && yarn build && cd ../flappy-plane && yarn build && cd ../../web && yarn build",
+    "build": "yarn build:games && yarn build:web",
     "build:games": "yarn build:puzzle && yarn build:flappy",
     "build:web": "yarn workspace @bini-game-town/web build",
     "build:puzzle": "yarn workspace @bini-game-town/bini-puzzle build",

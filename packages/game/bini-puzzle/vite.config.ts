@@ -5,7 +5,7 @@ export default defineConfig({
   plugins: [],
   base: "/game/bini-puzzle/",
   build: {
-    outDir: "../../dist/game/bini-puzzle",
+    outDir: "../../../dist/game/bini-puzzle",
     emptyOutDir: true,
   },
 });
