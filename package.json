@@ -13,8 +13,9 @@
   ],
   "scripts": {
     "dev": "yarn workspace @bini-game-town/web dev",
-    "build": "yarn build:games && yarn build:web",
-    "build:games": "yarn build:puzzle && yarn build:flappy",
+    "prebuild": "mkdir -p dist/game/bini-puzzle dist/game/flappy-plane",
+    "build": "yarn workspace @bini-game-town/web build && yarn workspace @bini-game-town/bini-puzzle build && yarn workspace @bini-game-town/flappy-plane build",
+    "build:games": "yarn workspace @bini-game-town/bini-puzzle build && yarn workspace @bini-game-town/flappy-plane build",
     "build:web": "yarn workspace @bini-game-town/web build",
     "build:puzzle": "yarn workspace @bini-game-town/bini-puzzle build",
     "build:flappy": "yarn workspace @bini-game-town/flappy-plane build",

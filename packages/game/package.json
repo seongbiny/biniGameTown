@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "build": "echo '게임 공통 설정 - 개별 게임 빌드는 각 폴더에서 실행됩니다'"
+    "build": "cd bini-puzzle && yarn build && cd .. && cd flappy-plane && yarn build && cd .. && mkdir -p ../dist/game/bini-puzzle && mkdir -p ../dist/game/flappy-plane && cp -r ./bini-puzzle/dist/* ../dist/game/bini-puzzle/ && cp -r ./flappy-plane/dist/* ../dist/game/flappy-plane/"
   },
   "devDependencies": {
     "typescript": "~5.7.2",
