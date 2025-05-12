@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "build": "cd bini-puzzle && yarn build && cd .. && cd flappy-plane && yarn build && cd .. && mkdir -p ../dist/game/bini-puzzle && mkdir -p ../dist/game/flappy-plane && cp -r ./bini-puzzle/dist/* ../dist/game/bini-puzzle/ && cp -r ./flappy-plane/dist/* ../dist/game/flappy-plane/"
+    "build": "cd bini-puzzle && yarn build && cd ../flappy-plane && yarn build"
   },
   "devDependencies": {
     "typescript": "~5.7.2",
