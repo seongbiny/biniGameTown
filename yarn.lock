@@ -247,6 +247,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@bini-game-town/bini-puzzle-web@workspace:packages/game/bini-puzzle-web":
+  version: 0.0.0-use.local
+  resolution: "@bini-game-town/bini-puzzle-web@workspace:packages/game/bini-puzzle-web"
+  dependencies:
+    "@eslint/js": "npm:^9.25.0"
+    "@types/react": "npm:^19.1.2"
+    "@types/react-dom": "npm:^19.1.2"
+    "@vitejs/plugin-react": "npm:^4.4.1"
+    eslint: "npm:^9.25.0"
+    eslint-plugin-react-hooks: "npm:^5.2.0"
+    eslint-plugin-react-refresh: "npm:^0.4.19"
+    globals: "npm:^16.0.0"
+    react: "npm:^19.1.0"
+    react-dom: "npm:^19.1.0"
+    typescript: "npm:~5.8.3"
+    typescript-eslint: "npm:^8.30.1"
+    vite: "npm:^6.3.5"
+  languageName: unknown
+  linkType: soft
+
 "@bini-game-town/bini-puzzle@workspace:packages/game/bini-puzzle":
   version: 0.0.0-use.local
   resolution: "@bini-game-town/bini-puzzle@workspace:packages/game/bini-puzzle"
