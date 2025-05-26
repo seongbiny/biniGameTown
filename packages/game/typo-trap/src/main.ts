@@ -1,5 +1,5 @@
 import { Application } from "pixi.js";
-import { calculateStageSize } from "./utils/calculateStageSize";
+import { calculateStageSize } from "./game/utils/calculateStageSize";
 
 export class App {
   private app: Application = new Application();
