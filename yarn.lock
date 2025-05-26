@@ -3120,6 +3120,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lottie-web@npm:^5.13.0":
+  version: 5.13.0
+  resolution: "lottie-web@npm:5.13.0"
+  checksum: 10c0/b463ad462169df3f7e04b7f3716274e269842554f1d72b8303ca7245628f2512982a59ae31698b3d57fbcda886228ae160fcb2aa518c6cecd8a95974db2458ee
+  languageName: node
+  linkType: hard
+
 "lru-cache@npm:^10.0.1, lru-cache@npm:^10.2.0":
   version: 10.4.3
   resolution: "lru-cache@npm:10.4.3"
@@ -3540,7 +3547,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pixi.js@npm:^8.8.0, pixi.js@npm:^8.9.1":
+"pixi.js@npm:^8.8.0, pixi.js@npm:^8.9.1, pixi.js@npm:^8.9.2":
   version: 8.9.2
   resolution: "pixi.js@npm:8.9.2"
   dependencies:
@@ -4302,6 +4309,17 @@ __metadata:
   checksum: 10c0/39117e346ff8ebd87ae1510b3a77d5d92dae5a89bde588c747d25da5c146603a99c8ee588c7ef80faaf123d89ed46f6dbd918d534d641083177d5fac38b8a1cb
   languageName: node
   linkType: hard
+
+"typo-trap@workspace:packages/game/typo-trap":
+  version: 0.0.0-use.local
+  resolution: "typo-trap@workspace:packages/game/typo-trap"
+  dependencies:
+    lottie-web: "npm:^5.13.0"
+    pixi.js: "npm:^8.9.2"
+    typescript: "npm:~5.8.3"
+    vite: "npm:^6.3.5"
+  languageName: unknown
+  linkType: soft
 
 "undici-types@npm:~6.21.0":
   version: 6.21.0
