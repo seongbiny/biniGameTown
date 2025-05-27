@@ -1,4 +1,4 @@
-import { Container, Graphics } from "pixi.js";
+import { Container, Graphics, Text } from "pixi.js";
 import { Scene } from "./Scene";
 import { GAME_CONFIG } from "../../types";
 
@@ -8,7 +8,7 @@ export class PlayingScene extends Scene {
   private progressBarFill!: Graphics;
 
   private gridContainer!: Container;
-  private gridCells: Graphics[] = [];
+  private gridCells: Container[] = [];
 
   private currentStage: number = 1;
 
@@ -17,6 +17,61 @@ export class PlayingScene extends Scene {
   private timer: number = 0;
   private timeLeft: number = GAME_CONFIG.TIME_LIMIT;
   private isTimerRunning: boolean = false;
+
+  private readonly STAGE_WORDS: string[][][] = [
+    [
+      ["재촉", "재쵹"],
+      ["재촉", "재촉"],
+    ],
+    [
+      ["훈민정음", "훈민정음", "훈민정음"],
+      ["훈민정음", "훈민정음", "훈민정음"],
+      ["훈민정음", "훈민정음", "휸민정음"],
+    ],
+    [
+      ["대한민국", "대한민국", "데한민국", "대한민국"],
+      ["대한민국", "대한민국", "대한민국", "대한민국"],
+      ["대한민국", "대한민국", "대한민국", "대한민국"],
+      ["대한민국", "대한민국", "대한민국", "대한민국"],
+    ],
+    [
+      [
+        "대한\n민국\n만세",
+        "대한\n민국\n만세",
+        "대한\n민국\n만세",
+        "대한\n민국\n만세",
+        "대한\n민국\n만세",
+      ],
+      [
+        "대한\n민국\n만세",
+        "대한\n민국\n만세",
+        "대한\n민국\n만세",
+        "대한\n민국\n만세",
+        "대한\n민국\n만세",
+      ],
+      [
+        "대한\n민국\n만세",
+        "대한\n민국\n만세",
+        "대한\n민국\n만세",
+        "대한\n민국\n만세",
+        "대한\n민국\n만세",
+      ],
+      [
+        "대한\n민국\n만세",
+        "대한\n민국\n만세",
+        "대한\n민국\n만세",
+        "대한\n민국\n만세",
+        "대한\n민국\n만세",
+      ],
+      [
+        "대한\n민국\n만세",
+        "대한\n민국\n만세",
+        "대한\n민국\n만세",
+        "댸한\n민국\n만세",
+        "대한\n민국\n만세",
+      ],
+    ],
+  ];
 
   public initialize(): void {
     super.initialize();
@@ -69,8 +124,17 @@ export class PlayingScene extends Scene {
       for (let col = 0; col < gridSize; col++) {
         const x = col * (cellWidth + gap);
         const y = row * (cellHeight + gap);
+        const word = this.STAGE_WORDS[stage - 1][row][col];
 
-        const cell = this.createGridCell(x, y, cellWidth, cellHeight, row, col);
+        const cell = this.createGridCell(
+          x,
+          y,
+          cellWidth,
+          cellHeight,
+          row,
+          col,
+          word
+        );
         this.gridContainer.addChild(cell);
         this.gridCells.push(cell);
       }
@@ -83,27 +147,42 @@ export class PlayingScene extends Scene {
     width: number,
     height: number,
     row: number,
-    col: number
-  ): Graphics {
-    const cell = new Graphics();
+    col: number,
+    word: string
+  ): Container {
+    const bg = new Graphics();
+    bg.roundRect(0, 0, width, height, 20);
+    bg.fill(0xffffff);
+    bg.stroke({ width: 2, color: 0xe9e9e9 });
 
-    cell.roundRect(0, 0, width, height, 20);
-    cell.fill(0xffffff);
-    cell.stroke({ width: 2, color: 0xe9e9e9 });
+    const text = new Text({
+      text: word,
+      style: {
+        fontSize: 24,
+        fill: 0x000000,
+        align: "center",
+        fontWeight: "bold",
+      },
+    });
+    text.anchor.set(0.5);
+    text.x = width / 2;
+    text.y = height / 2;
 
-    cell.x = x;
-    cell.y = y;
+    const container = new Container();
+    container.addChild(bg, text);
+    container.x = x;
+    container.y = y;
 
-    cell.eventMode = "static";
-    cell.cursor = "pointer";
+    container.eventMode = "static";
+    container.cursor = "pointer";
 
-    cell.on("pointerdown", () => {
+    container.on("pointerdown", () => {
       this.onCellClick(row, col);
     });
 
-    (cell as any).gridPosition = { row, col };
+    (container as any).gridPosition = { row, col };
 
-    return cell;
+    return container;
   }
 
   private onCellClick(row: number, col: number): void {
