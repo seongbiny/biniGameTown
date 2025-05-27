@@ -1,5 +1,6 @@
 import { Application } from "pixi.js";
 import { calculateStageSize } from "./game/utils/calculateStageSize";
+import SceneController from "./game/core/SceneController";
 
 export class App {
   private app: Application = new Application();
@@ -16,12 +17,15 @@ export class App {
     await this.app.init({
       width: this.size.width,
       height: this.size.height,
-      background: "#333333",
+      background: "#F3F4F6",
     });
     this.app.stage.scale.set(this.size.scale);
 
     const container = document.getElementById("app")!;
     container?.appendChild(this.app.canvas);
+
+    const sceneController = SceneController.getInstance();
+    sceneController.initialize(this.app.stage);
 
     window.addEventListener("resize", () => {
       this.size = calculateStageSize(450, 800);
