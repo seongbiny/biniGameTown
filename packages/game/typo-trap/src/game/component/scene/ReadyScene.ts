@@ -1,5 +1,7 @@
 import { Container, Graphics, Text } from "pixi.js";
 import { Scene } from "./Scene";
+import SceneController from "../../core/SceneController";
+import { SceneType } from "../../types";
 
 export class ReadyScene extends Scene {
   private titleText!: Text;
@@ -94,6 +96,8 @@ export class ReadyScene extends Scene {
   private onCountdownComplete(): void {
     // 게임 매니저에 게임 시작 알림
     console.log("카운트다운 완료! 게임 시작");
+
+    SceneController.getInstance().switchScene(SceneType.PLAYING);
   }
 
   public reset(): void {

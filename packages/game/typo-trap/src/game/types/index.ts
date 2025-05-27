@@ -6,20 +6,14 @@ export const SceneType = {
 
 export type SceneType = (typeof SceneType)[keyof typeof SceneType];
 
-export const GameStatus = {
-  WAITING: "WAITING",
-  PLAYING: "PLAYING",
-  FINISHED: "FINISHED",
+export const PlayingState = {
+  PLAYING: "playing",
+  SUCCESS: "success",
+  TIMEOUT: "timeout",
+  WRONG: "wrong",
 } as const;
 
-export type GameStatus = (typeof GameStatus)[keyof typeof GameStatus];
-
-export interface StageInfo {
-  stage: number;
-  gridSize: number;
-  wordCount: number;
-}
-
+export type PlayingState = (typeof PlayingState)[keyof typeof PlayingState];
 export interface WordData {
   id: string;
   text: string;
@@ -35,13 +29,6 @@ export interface GridData {
   size: number;
   words: WordData[];
   correctWordId: string;
-}
-
-export interface GameState {
-  status: GameStatus;
-  currentStage: number;
-  timeLeft: number;
-  reachedStage: number;
 }
 
 export const GAME_CONFIG = {
