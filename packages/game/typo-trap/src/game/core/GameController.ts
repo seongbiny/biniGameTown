@@ -20,8 +20,9 @@ export class GameController {
   private readonly CORRECT_POSITIONS = [
     { row: 0, col: 1 }, // 1단계: "재쵹"
     { row: 2, col: 2 }, // 2단계: "휸민정음"
-    { row: 0, col: 2 }, // 3단계: "데한민국"
+    { row: 0, col: 2 }, // 3단계: "새종대왕"
     { row: 4, col: 3 }, // 4단계: "댸한\n민국\n만세"
+    { row: 4, col: 3 }, // 5단계: "걔미\n허리\n왕잠\n자리"
   ];
 
   public static getInstance(): GameController {

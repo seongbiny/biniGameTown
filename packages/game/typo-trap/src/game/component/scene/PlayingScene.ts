@@ -23,7 +23,15 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
   private selectedCell: Container | null = null;
   private gameController: GameController;
 
-  private readonly STAGE_GAPS = [10, 7, 5, 3];
+  private readonly STAGE_GAPS = [10, 7, 5, 3, 3];
+
+  private readonly STAGE_FONT_SIZES = [
+    32, // 1단계: 2x2 - 큰 폰트
+    28, // 2단계: 3x3 - 중간 폰트
+    24, // 3단계: 4x4 - 기본 폰트
+    20, // 4단계: 5x5 - 작은 폰트
+    18, // 5단계: 5x5 - 더 작은 폰트
+  ];
 
   private readonly STAGE_WORDS: string[][][] = [
     [
@@ -36,10 +44,10 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
       ["훈민정음", "훈민정음", "휸민정음"],
     ],
     [
-      ["대한민국", "대한민국", "데한민국", "대한민국"],
-      ["대한민국", "대한민국", "대한민국", "대한민국"],
-      ["대한민국", "대한민국", "대한민국", "대한민국"],
-      ["대한민국", "대한민국", "대한민국", "대한민국"],
+      ["세종대왕", "세종대왕", "새종대왕", "세종대왕"],
+      ["세종대왕", "세종대왕", "세종대왕", "세종대왕"],
+      ["세종대왕", "세종대왕", "세종대왕", "세종대왕"],
+      ["세종대왕", "세종대왕", "세종대왕", "세종대왕"],
     ],
     [
       [
@@ -76,6 +84,43 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
         "대한\n민국\n만세",
         "댸한\n민국\n만세",
         "대한\n민국\n만세",
+      ],
+    ],
+    [
+      [
+        "개미\n허리\n왕잠\n자리",
+        "개미\n허리\n왕잠\n자리",
+        "개미\n허리\n왕잠\n자리",
+        "개미\n허리\n왕잠\n자리",
+        "개미\n허리\n왕잠\n자리",
+      ],
+      [
+        "개미\n허리\n왕잠\n자리",
+        "개미\n허리\n왕잠\n자리",
+        "개미\n허리\n왕잠\n자리",
+        "개미\n허리\n왕잠\n자리",
+        "개미\n허리\n왕잠\n자리",
+      ],
+      [
+        "개미\n허리\n왕잠\n자리",
+        "개미\n허리\n왕잠\n자리",
+        "개미\n허리\n왕잠\n자리",
+        "개미\n허리\n왕잠\n자리",
+        "개미\n허리\n왕잠\n자리",
+      ],
+      [
+        "개미\n허리\n왕잠\n자리",
+        "개미\n허리\n왕잠\n자리",
+        "개미\n허리\n왕잠\n자리",
+        "개미\n허리\n왕잠\n자리",
+        "개미\n허리\n왕잠\n자리",
+      ],
+      [
+        "개미\n허리\n왕잠\n자리",
+        "개미\n허리\n왕잠\n자리",
+        "개미\n허리\n왕잠\n자리",
+        "걔미\n허리\n왕잠\n자리",
+        "개미\n허리\n왕잠\n자리",
       ],
     ],
   ];
@@ -408,7 +453,8 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
           cellHeight,
           row,
           col,
-          word
+          word,
+          stage
         );
         this.gridContainer.addChild(cell);
         this.gridCells.push(cell);
@@ -423,17 +469,20 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
     height: number,
     row: number,
     col: number,
-    word: string
+    word: string,
+    stage: number
   ): Container {
     const bg = new Graphics();
     bg.roundRect(0, 0, width, height, 20);
     bg.fill(0xffffff);
     bg.stroke({ width: 2, color: 0xe9e9e9 });
 
+    const fontSize = this.STAGE_FONT_SIZES[stage - 1];
+
     const text = new Text({
       text: word,
       style: {
-        fontSize: 24,
+        fontSize: fontSize,
         fill: 0x000000,
         align: "center",
         fontWeight: "bold",

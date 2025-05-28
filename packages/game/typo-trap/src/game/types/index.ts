@@ -32,7 +32,7 @@ export interface GridData {
 }
 
 export const GAME_CONFIG = {
-  STAGE_COUNT: 4,
+  STAGE_COUNT: 5,
   TIME_LIMIT: 5000,
-  GRID_SIZES: [2, 3, 4, 5],
+  GRID_SIZES: [2, 3, 4, 5, 5],
 } as const;
