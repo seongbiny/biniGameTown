@@ -134,8 +134,8 @@ export class GameController {
 
     const resultData = {
       stage: "timeout",
-      message: "시간 초과! ⏰\n다시 도전하세요",
-      buttonText: "다시하기",
+      topMessage: "앗, 아쉬워요\n시간이 끝났어요",
+      buttonText: "다시 도전하기",
       buttonColor: 0xff9800,
       canProceed: false,
     };

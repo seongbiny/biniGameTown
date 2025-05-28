@@ -112,13 +112,29 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
         this.handleSuccessState(data);
         break;
 
-      case PlayingState.WRONG:
       case PlayingState.TIMEOUT:
+        this.handleTimeoutState(data);
+        break;
+
+      case PlayingState.WRONG:
         if (data) {
           this.showStateUI(data.message, data.buttonText, data.buttonColor);
         }
         break;
     }
+  }
+
+  private handleTimeoutState(data: any): void {
+    if (!data) return;
+
+    // 프로그레스바 숨기고 상단에 시간 초과 메시지 표시
+    this.progressBarContainer.visible = false;
+    this.successMessageText.text = data.topMessage;
+    this.successMessageText.style.fill = 0xff9800; // 주황색으로 변경
+    this.successMessageText.visible = true;
+
+    // 하단에 버튼만 표시
+    this.showStateUI("", data.buttonText, data.buttonColor);
   }
 
   private handleSuccessState(data: any): void {
