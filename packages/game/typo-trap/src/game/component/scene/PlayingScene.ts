@@ -117,9 +117,7 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
         break;
 
       case PlayingState.WRONG:
-        if (data) {
-          this.showStateUI(data.message, data.buttonText, data.buttonColor);
-        }
+        this.handleWrongState(data);
         break;
     }
   }
@@ -163,6 +161,80 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
           data.buttonColor
         );
         break;
+    }
+  }
+
+  private handleWrongState(data: any): void {
+    if (!data) return;
+
+    // 선택한 셀을 빨간색으로, 정답 셀을 검은색으로 표시
+    if (data.selectedPosition && data.correctPosition) {
+      this.highlightWrongAndCorrectCells(
+        data.selectedPosition,
+        data.correctPosition
+      );
+    }
+
+    // 프로그레스바 숨기고 상단에 오답 메시지 표시
+    this.progressBarContainer.visible = false;
+    this.successMessageText.text = data.topMessage;
+    this.successMessageText.style.fill = 0xf69f9f; // 연분홍색으로 변경
+    this.successMessageText.visible = true;
+
+    // 하단에 버튼만 표시
+    this.showStateUI("", data.buttonText, data.buttonColor);
+  }
+
+  private highlightWrongAndCorrectCells(
+    selectedPos: { row: number; col: number },
+    correctPos: { row: number; col: number }
+  ): void {
+    this.gridCells.forEach((cell) => {
+      const position = (cell as any).gridPosition;
+
+      if (
+        position.row === selectedPos.row &&
+        position.col === selectedPos.col
+      ) {
+        // 선택한 셀 (틀린 답) - 연분홍색
+        this.applyCellWrongStyle(cell);
+      } else if (
+        position.row === correctPos.row &&
+        position.col === correctPos.col
+      ) {
+        // 정답 셀 - 검은색
+        this.applyCellCorrectStyle(cell);
+      } else {
+        // 나머지 셀들은 기본 스타일로
+        this.resetCellStyle(cell);
+      }
+    });
+
+    // 선택된 셀 정보 초기화
+    this.selectedCell = null;
+  }
+
+  private applyCellWrongStyle(cell: Container): void {
+    const bg = (cell as any).background as Graphics;
+    const dimensions = (cell as any).cellDimensions;
+
+    if (bg && dimensions) {
+      bg.clear();
+      bg.roundRect(0, 0, dimensions.width, dimensions.height, 20);
+      bg.fill(0xffffff);
+      bg.stroke({ width: 3, color: 0xf69f9f }); // 연분홍색
+    }
+  }
+
+  private applyCellCorrectStyle(cell: Container): void {
+    const bg = (cell as any).background as Graphics;
+    const dimensions = (cell as any).cellDimensions;
+
+    if (bg && dimensions) {
+      bg.clear();
+      bg.roundRect(0, 0, dimensions.width, dimensions.height, 20);
+      bg.fill(0xffffff);
+      bg.stroke({ width: 3, color: 0x000000 }); // 검은색
     }
   }
 

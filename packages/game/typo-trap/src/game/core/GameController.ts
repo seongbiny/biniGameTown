@@ -52,8 +52,8 @@ export class GameController {
     this.startTimer();
   }
 
-  public handleCellClick(row: number, col: number): boolean {
-    if (this.gameState !== PlayingState.PLAYING) return false;
+  public handleCellClick(row: number, col: number): void {
+    if (this.gameState !== PlayingState.PLAYING) return;
 
     this.stopTimer();
 
@@ -61,17 +61,21 @@ export class GameController {
     const isCorrect = row === correctPos.row && col === correctPos.col;
 
     if (isCorrect) {
-      this.handleCorrectAnswer();
+      this.gameState = PlayingState.SUCCESS;
+      this.handleSuccess();
     } else {
-      this.handleWrongAnswer();
+      this.gameState = PlayingState.WRONG;
+      this.callbacks?.onStateChange(PlayingState.WRONG, {
+        topMessage: "앗, 아쉬워요\n정답이 아니에요",
+        buttonText: "다시 도전하기",
+        buttonColor: 0x666666,
+        selectedPosition: { row, col },
+        correctPosition: correctPos,
+      });
     }
-
-    return isCorrect;
   }
 
-  private handleCorrectAnswer(): void {
-    this.gameState = PlayingState.SUCCESS;
-
+  private handleSuccess(): void {
     const resultData = {
       stage: "success_message",
       message: `${this.currentStage}단계 성공!`,
@@ -111,21 +115,6 @@ export class GameController {
 
       this.callbacks?.onStateChange(this.gameState, resultData);
     }
-  }
-
-  private handleWrongAnswer(): void {
-    this.gameState = PlayingState.WRONG;
-    console.log("❌ Wrong answer!");
-
-    const resultData = {
-      stage: "wrong",
-      message: "틀렸습니다! 😢\n다시 도전하세요",
-      buttonText: "다시하기",
-      buttonColor: 0xff5722,
-      canProceed: false,
-    };
-
-    this.callbacks?.onStateChange(this.gameState, resultData);
   }
 
   private handleTimeOut(): void {
