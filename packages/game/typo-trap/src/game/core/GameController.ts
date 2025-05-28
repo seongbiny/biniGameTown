@@ -73,14 +73,44 @@ export class GameController {
     this.gameState = PlayingState.SUCCESS;
 
     const resultData = {
-      message: "정답입니다! 🎉",
-      buttonText:
-        this.currentStage < GAME_CONFIG.STAGE_COUNT ? "다음 단계" : "완료",
-      buttonColor: 0x4caf50,
-      canProceed: true,
+      stage: "success_message",
+      message: `${this.currentStage}단계 성공!`,
+      currentStage: this.currentStage,
+      isLastStage: this.currentStage >= GAME_CONFIG.STAGE_COUNT,
     };
 
     this.callbacks?.onStateChange(this.gameState, resultData);
+
+    setTimeout(() => {
+      this.showNextStageConfirm();
+    }, 1000);
+  }
+
+  private showNextStageConfirm(): void {
+    if (this.currentStage < GAME_CONFIG.STAGE_COUNT) {
+      const nextStage = this.currentStage + 1;
+      const resultData = {
+        stage: "next_stage_confirm",
+        topMessage: `${nextStage}단계도 바로\n도전해 볼까요?`, // 상단 메시지
+        buttonText: `${nextStage}단계 도전하기`,
+        buttonColor: 0x4caf50,
+        currentStage: this.currentStage,
+        nextStage: nextStage,
+      };
+
+      this.callbacks?.onStateChange(this.gameState, resultData);
+    } else {
+      // 마지막 단계인 경우
+      const resultData = {
+        stage: "all_complete",
+        topMessage: "모든 단계 완료! 🎉\n축하합니다!",
+        buttonText: "결과 보기",
+        buttonColor: 0x4caf50,
+        currentStage: this.currentStage,
+      };
+
+      this.callbacks?.onStateChange(this.gameState, resultData);
+    }
   }
 
   private handleWrongAnswer(): void {
@@ -88,6 +118,7 @@ export class GameController {
     console.log("❌ Wrong answer!");
 
     const resultData = {
+      stage: "wrong",
       message: "틀렸습니다! 😢\n다시 도전하세요",
       buttonText: "다시하기",
       buttonColor: 0xff5722,
@@ -102,6 +133,7 @@ export class GameController {
     console.log("⏰ Time out!");
 
     const resultData = {
+      stage: "timeout",
       message: "시간 초과! ⏰\n다시 도전하세요",
       buttonText: "다시하기",
       buttonColor: 0xff9800,

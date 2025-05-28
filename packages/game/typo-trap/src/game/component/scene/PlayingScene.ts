@@ -18,6 +18,8 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
   private actionButton!: Graphics;
   private buttonText!: Text;
 
+  private successMessageText!: Text;
+
   private selectedCell: Container | null = null;
   private gameController: GameController;
 
@@ -87,6 +89,7 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
     super.initialize();
 
     this.createProgressBar();
+    this.createSuccessMessage();
     this.createStateUI();
     this.createGrid();
 
@@ -101,11 +104,14 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
 
     switch (state) {
       case PlayingState.PLAYING:
-        this.stateUIContainer.visible = false;
+        this.showGameUI();
         this.clearAllCellSelections();
         break;
 
       case PlayingState.SUCCESS:
+        this.handleSuccessState(data);
+        break;
+
       case PlayingState.WRONG:
       case PlayingState.TIMEOUT:
         if (data) {
@@ -115,6 +121,70 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
     }
   }
 
+  private handleSuccessState(data: any): void {
+    if (!data) return;
+
+    switch (data.stage) {
+      case "success_message":
+        // 1단계: "N단계 성공!" 메시지만 상단에 표시
+        this.showSuccessMessage(data.message);
+        break;
+
+      case "next_stage_confirm":
+        // 2단계: 상단 메시지 변경 + 하단 버튼 표시
+        this.showNextStageUI(
+          data.topMessage,
+          data.buttonText,
+          data.buttonColor
+        );
+        break;
+
+      case "all_complete":
+        // 모든 단계 완료
+        this.showNextStageUI(
+          data.topMessage,
+          data.buttonText,
+          data.buttonColor
+        );
+        break;
+    }
+  }
+
+  private showGameUI(): void {
+    this.progressBarContainer.visible = true;
+    this.successMessageText.visible = false;
+    this.stateUIContainer.visible = false;
+  }
+
+  private showSuccessMessage(message: string): void {
+    this.progressBarContainer.visible = false;
+    this.successMessageText.text = message;
+    this.successMessageText.visible = true;
+    this.stateUIContainer.visible = false;
+  }
+
+  private showNextStageUI(
+    topMessage: string,
+    buttonText: string,
+    buttonColor: number
+  ): void {
+    // 상단 메시지 변경
+    this.successMessageText.text = topMessage;
+    this.successMessageText.visible = true;
+
+    // 하단에 버튼만 표시 (메시지는 비우기)
+    this.showStateUI("", buttonText, buttonColor);
+  }
+
+  private showNextStageConfirm(
+    message: string,
+    buttonText: string,
+    buttonColor: number
+  ): void {
+    // 성공 메시지는 그대로 두고, 하단에 확인 UI 표시
+    this.showStateUI(message, buttonText, buttonColor);
+  }
+
   public onTimerUpdate(timeLeft: number, progress: number): void {
     this.updateProgressBar(progress);
   }
@@ -122,6 +192,23 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
   public onStageChange(stage: number): void {
     console.log(`🎯 Stage changed to: ${stage}`);
     this.createGridForStage(stage);
+  }
+
+  private createSuccessMessage(): void {
+    this.successMessageText = new Text({
+      text: "",
+      style: {
+        fontSize: 24,
+        fill: 0x4caf50, // 초록색
+        align: "center",
+        fontWeight: "bold",
+      },
+    });
+    this.successMessageText.anchor.set(0.5);
+    this.successMessageText.x = this.screenWidth / 2;
+    this.successMessageText.y = 34 + 5; // 프로그레스바와 같은 위치
+    this.successMessageText.visible = false;
+    this.addChild(this.successMessageText);
   }
 
   private createStateUI(): void {
@@ -162,6 +249,25 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
     this.actionButton.addChild(this.buttonText);
 
     this.stateUIContainer.visible = false;
+  }
+
+  private onButtonClick(): void {
+    const currentState = this.gameController.getGameState();
+    console.log(`🔘 Button clicked in state: ${currentState}`);
+
+    switch (currentState) {
+      case PlayingState.SUCCESS:
+        const hasNextStage = this.gameController.proceedToNextStage();
+        if (!hasNextStage) {
+          SceneController.getInstance().switchScene("RESULT");
+        }
+        break;
+
+      case PlayingState.WRONG:
+      case PlayingState.TIMEOUT:
+        SceneController.getInstance().switchScene("READY");
+        break;
+    }
   }
 
   private createProgressBar(): void {
@@ -326,7 +432,13 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
     buttonText: string,
     buttonColor: number
   ): void {
-    this.messageText.text = message;
+    // 메시지가 비어있으면 텍스트 숨기기
+    if (message.trim() === "") {
+      this.messageText.visible = false;
+    } else {
+      this.messageText.text = message;
+      this.messageText.visible = true;
+    }
 
     this.actionButton.clear();
     this.actionButton.roundRect(-80, -20, 160, 40, 20);
@@ -335,28 +447,6 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
 
     this.buttonText.text = buttonText;
     this.stateUIContainer.visible = true;
-  }
-
-  private onButtonClick(): void {
-    const currentState = this.gameController.getGameState();
-    console.log(`🔘 Button clicked in state: ${currentState}`);
-
-    switch (currentState) {
-      case PlayingState.SUCCESS:
-        // 다음 단계로 진행 또는 완료
-        const hasNextStage = this.gameController.proceedToNextStage();
-        if (!hasNextStage) {
-          // 모든 단계 완료 → ResultScene으로
-          SceneController.getInstance().switchScene("RESULT");
-        }
-        break;
-
-      case PlayingState.WRONG:
-      case PlayingState.TIMEOUT:
-        // ReadyScene으로 돌아가기
-        SceneController.getInstance().switchScene("READY");
-        break;
-    }
   }
 
   private clearGrid(): void {
@@ -370,7 +460,7 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
   private updateProgressBar(progress: number = 1.0): void {
     this.progressBarFill.clear();
 
-    const fillWidth = 345 * Math.max(0, progress);
+    const fillWidth = 345 * Math.max(0, Math.min(1, progress)); // progress를 0-1로 제한
 
     if (fillWidth > 0) {
       this.progressBarFill.rect(0, 0, fillWidth, 10);
