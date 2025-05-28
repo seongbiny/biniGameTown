@@ -1,6 +1,7 @@
 import { Application } from "pixi.js";
 import { calculateStageSize } from "./game/utils/calculateStageSize";
 import SceneController from "./game/core/SceneController";
+import { assetsPreload } from "./assets/assetsPreload";
 
 export class App {
   private app: Application = new Application();
@@ -25,6 +26,8 @@ export class App {
 
     const container = document.getElementById("app")!;
     container?.appendChild(this.app.canvas);
+
+    await assetsPreload();
 
     const sceneController = SceneController.getInstance();
     sceneController.initialize(this.app.stage);
