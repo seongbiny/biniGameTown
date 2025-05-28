@@ -33,9 +33,11 @@ export class ResultScene extends Scene {
     this.kingImage.anchor.set(0.5);
 
     this.kingImage.x = this.screenWidth / 2;
-    this.kingImage.y = 100 + this.kingImage.height / 2;
+    // 화면 중앙 부분으로 이동 (화면 높이의 약 30% 지점)
+    this.kingImage.y = this.screenHeight * 0.3;
 
-    this.kingImage.scale.set(0.5);
+    this.kingImage.width = 170;
+    this.kingImage.height = 200;
 
     this.addChild(this.kingImage);
   }
@@ -52,8 +54,9 @@ export class ResultScene extends Scene {
 
     this.congratulationText.anchor.set(0.5);
     this.congratulationText.x = this.screenWidth / 2;
+    // king 이미지에서 30px 아래
     this.congratulationText.y =
-      this.kingImage.y + this.kingImage.height / 2 + 40;
+      this.kingImage.y + this.kingImage.height / 2 + 30;
 
     this.addChild(this.congratulationText);
   }
@@ -62,7 +65,7 @@ export class ResultScene extends Scene {
     this.recordText = new Text({
       text: "00초를 기록했어요",
       style: {
-        fontSize: 24,
+        fontSize: 32,
         fill: 0x000000,
         align: "center",
       },
@@ -70,7 +73,8 @@ export class ResultScene extends Scene {
 
     this.recordText.anchor.set(0.5);
     this.recordText.x = this.screenWidth / 2;
-    this.recordText.y = this.congratulationText.y + 50;
+    // 축하 텍스트에서 20px 아래 (간격을 좀 더 줄임)
+    this.recordText.y = this.congratulationText.y + 40;
 
     this.addChild(this.recordText);
   }
