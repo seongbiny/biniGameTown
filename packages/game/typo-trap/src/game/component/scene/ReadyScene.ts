@@ -107,5 +107,26 @@ export class ReadyScene extends Scene {
     }
     this.currentCount = 3;
     super.reset();
+
+    // reset 후 카운트다운 재시작
+    this.startCountdown();
+    console.log("🔄 ReadyScene reset complete");
+  }
+
+  public resume(): void {
+    super.resume();
+    console.log("▶️ ReadyScene resumed");
+  }
+
+  public pause(): void {
+    super.pause();
+
+    // 타이머 정리
+    if (this.countdownTimer) {
+      clearInterval(this.countdownTimer);
+      this.countdownTimer = undefined;
+    }
+
+    console.log("⏸️ ReadyScene paused");
   }
 }

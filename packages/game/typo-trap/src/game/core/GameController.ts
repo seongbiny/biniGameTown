@@ -174,8 +174,20 @@ export class GameController {
   }
 
   public cleanup(): void {
+    console.log("🧹 GameController cleanup started");
+
     this.stopTimer();
-    this.callbacks = null;
+
+    // 상태 초기화
+    this.gameState = PlayingState.PLAYING;
+    this.currentStage = 1;
+    this.timeLeft = GAME_CONFIG.TIME_LIMIT;
+    this.isTimerRunning = false;
+
+    // 콜백 제거는 하지 않음 (씬이 다시 사용될 수 있으므로)
+    // this.callbacks = null;
+
+    console.log("✅ GameController cleanup complete");
   }
 
   public getCurrentStage(): number {

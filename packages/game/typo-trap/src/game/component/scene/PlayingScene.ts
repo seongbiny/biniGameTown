@@ -558,11 +558,32 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
 
   public reset(): void {
     super.reset();
+
+    // GameController 정리
     this.gameController.cleanup();
+
+    // UI 상태 초기화
+    this.progressBarContainer.visible = true;
+    this.successMessageText.visible = false;
+    this.stateUIContainer.visible = false;
+
+    // 그리드 정리
+    this.clearGrid();
+    this.clearAllCellSelections();
+
+    // GameController 재초기화 및 새 게임 시작
+    this.gameController.initialize(this);
+    this.gameController.startNewGame();
+
+    console.log("🔄 PlayingScene reset complete");
   }
 
   public pause(): void {
     super.pause();
+
+    // GameController 정리 (타이머 정지 등)
+    this.gameController.cleanup();
+
     console.log("⏸️ PlayingScene paused");
   }
 
