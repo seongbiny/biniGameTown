@@ -1,8 +1,11 @@
 import { Container, Graphics, Text } from "pixi.js";
 import { Scene } from "./Scene";
-import { GAME_CONFIG } from "../../types";
+import { GAME_CONFIG, PlayingState } from "../../types";
+import SceneController from "../../core/SceneController";
+import { GameController } from "../../core/GameController";
+import type { GameEventCallbacks } from "../../core/GameController";
 
-export class PlayingScene extends Scene {
+export class PlayingScene extends Scene implements GameEventCallbacks {
   private progressBarContainer!: Container;
   private progressBarBg!: Graphics;
   private progressBarFill!: Graphics;
@@ -10,13 +13,15 @@ export class PlayingScene extends Scene {
   private gridContainer!: Container;
   private gridCells: Container[] = [];
 
-  private currentStage: number = 1;
+  private stateUIContainer!: Container;
+  private messageText!: Text;
+  private actionButton!: Graphics;
+  private buttonText!: Text;
+
+  private selectedCell: Container | null = null;
+  private gameController: GameController;
 
   private readonly STAGE_GAPS = [10, 7, 5, 3];
-
-  private timer: number = 0;
-  private timeLeft: number = GAME_CONFIG.TIME_LIMIT;
-  private isTimerRunning: boolean = false;
 
   private readonly STAGE_WORDS: string[][][] = [
     [
@@ -73,12 +78,90 @@ export class PlayingScene extends Scene {
     ],
   ];
 
+  constructor(parent: Container) {
+    super(parent);
+    this.gameController = GameController.getInstance();
+  }
+
   public initialize(): void {
     super.initialize();
 
     this.createProgressBar();
+    this.createStateUI();
     this.createGrid();
-    this.startTimer();
+
+    // GameManager 초기화 및 콜백 설정
+    this.gameController.initialize(this);
+    this.gameController.startNewGame();
+  }
+
+  // GameEventCallbacks 인터페이스 구현
+  public onStateChange(state: PlayingState, data?: any): void {
+    console.log(`🎮 Game state changed to: ${state}`);
+
+    switch (state) {
+      case PlayingState.PLAYING:
+        this.stateUIContainer.visible = false;
+        this.clearAllCellSelections();
+        break;
+
+      case PlayingState.SUCCESS:
+      case PlayingState.WRONG:
+      case PlayingState.TIMEOUT:
+        if (data) {
+          this.showStateUI(data.message, data.buttonText, data.buttonColor);
+        }
+        break;
+    }
+  }
+
+  public onTimerUpdate(timeLeft: number, progress: number): void {
+    this.updateProgressBar(progress);
+  }
+
+  public onStageChange(stage: number): void {
+    console.log(`🎯 Stage changed to: ${stage}`);
+    this.createGridForStage(stage);
+  }
+
+  private createStateUI(): void {
+    this.stateUIContainer = new Container();
+    this.addChild(this.stateUIContainer);
+
+    this.messageText = new Text({
+      text: "",
+      style: {
+        fontSize: 24,
+        fill: 0x000000,
+        align: "center",
+      },
+    });
+    this.messageText.anchor.set(0.5);
+    this.messageText.x = this.screenWidth / 2;
+    this.messageText.y = this.screenHeight - 120;
+    this.stateUIContainer.addChild(this.messageText);
+
+    this.actionButton = new Graphics();
+    this.actionButton.x = this.screenWidth / 2;
+    this.actionButton.y = this.screenHeight - 60;
+    this.actionButton.eventMode = "static";
+    this.actionButton.cursor = "pointer";
+    this.actionButton.on("pointerdown", this.onButtonClick.bind(this));
+    this.stateUIContainer.addChild(this.actionButton);
+
+    this.buttonText = new Text({
+      text: "",
+      style: {
+        fontSize: 20,
+        fill: 0xffffff,
+        align: "center",
+      },
+    });
+
+    this.buttonText.anchor.set(0.5);
+    this.actionButton.addChild(this.buttonText);
+
+    this.stateUIContainer.visible = false;
   }
 
   private createProgressBar(): void {
@@ -98,7 +181,7 @@ export class PlayingScene extends Scene {
       this.progressBarFill
     );
 
-    this.updateProgressBar();
+    this.updateProgressBar(1.0);
   }
 
   private createGrid(): void {
@@ -107,8 +190,6 @@ export class PlayingScene extends Scene {
 
     this.gridContainer.x = (this.screenWidth - 400) / 2;
     this.gridContainer.y = (this.screenHeight - 500) / 2;
-
-    this.createGridForStage(this.currentStage);
   }
 
   private createGridForStage(stage: number): void {
@@ -177,28 +258,104 @@ export class PlayingScene extends Scene {
     container.cursor = "pointer";
 
     container.on("pointerdown", () => {
-      this.onCellClick(row, col);
+      this.onCellClick(row, col, container);
     });
 
     (container as any).gridPosition = { row, col };
+    (container as any).background = bg;
+    (container as any).cellDimensions = { width, height };
 
     return container;
   }
 
-  private onCellClick(row: number, col: number): void {
-    console.log(`🎯 Cell selected: (${row}, ${col})`);
+  private onCellClick(
+    row: number,
+    col: number,
+    cellContainer: Container
+  ): void {
+    console.log(`🎯 Cell clicked: (${row}, ${col})`);
 
-    // TODO: 여기에 정답/오답 체크 로직 추가
-    // 현재는 디버그용 로그만 출력
+    this.updateCellSelection(cellContainer);
+
+    // GameManager에게 클릭 이벤트 전달
+    this.gameController.handleCellClick(row, col);
   }
 
-  private nextStage(): void {
-    if (this.currentStage < GAME_CONFIG.STAGE_COUNT) {
-      this.currentStage++;
-      this.createGridForStage(this.currentStage);
-      console.log(`⬆️ Advanced to stage ${this.currentStage}`);
-    } else {
-      console.log("🎉 All stages completed!");
+  private updateCellSelection(newSelectedCell: Container): void {
+    if (this.selectedCell) {
+      this.resetCellStyle(this.selectedCell);
+    }
+
+    this.applyCellSelectedStyle(newSelectedCell);
+    this.selectedCell = newSelectedCell;
+  }
+
+  private resetCellStyle(cell: Container): void {
+    const bg = (cell as any).background as Graphics;
+    const dimensions = (cell as any).cellDimensions;
+
+    if (bg && dimensions) {
+      bg.clear();
+      bg.roundRect(0, 0, dimensions.width, dimensions.height, 20);
+      bg.fill(0xffffff);
+      bg.stroke({ width: 2, color: 0xe9e9e9 });
+    }
+  }
+
+  private applyCellSelectedStyle(cell: Container): void {
+    const bg = (cell as any).background as Graphics;
+    const dimensions = (cell as any).cellDimensions;
+
+    if (bg && dimensions) {
+      bg.clear();
+      bg.roundRect(0, 0, dimensions.width, dimensions.height, 20);
+      bg.fill(0xffffff);
+      bg.stroke({ width: 3, color: 0x000000 });
+    }
+  }
+
+  private clearAllCellSelections(): void {
+    this.gridCells.forEach((cell) => {
+      this.resetCellStyle(cell);
+    });
+    this.selectedCell = null;
+  }
+
+  private showStateUI(
+    message: string,
+    buttonText: string,
+    buttonColor: number
+  ): void {
+    this.messageText.text = message;
+
+    this.actionButton.clear();
+    this.actionButton.roundRect(-80, -20, 160, 40, 20);
+    this.actionButton.fill(buttonColor);
+    this.actionButton.stroke({ width: 2, color: buttonColor });
+
+    this.buttonText.text = buttonText;
+    this.stateUIContainer.visible = true;
+  }
+
+  private onButtonClick(): void {
+    const currentState = this.gameController.getGameState();
+    console.log(`🔘 Button clicked in state: ${currentState}`);
+
+    switch (currentState) {
+      case PlayingState.SUCCESS:
+        // 다음 단계로 진행 또는 완료
+        const hasNextStage = this.gameController.proceedToNextStage();
+        if (!hasNextStage) {
+          // 모든 단계 완료 → ResultScene으로
+          SceneController.getInstance().switchScene("RESULT");
+        }
+        break;
+
+      case PlayingState.WRONG:
+      case PlayingState.TIMEOUT:
+        // ReadyScene으로 돌아가기
+        SceneController.getInstance().switchScene("READY");
+        break;
     }
   }
 
@@ -210,11 +367,10 @@ export class PlayingScene extends Scene {
     this.gridCells = [];
   }
 
-  private updateProgressBar(): void {
+  private updateProgressBar(progress: number = 1.0): void {
     this.progressBarFill.clear();
 
-    const progress = Math.max(0, this.timeLeft / GAME_CONFIG.TIME_LIMIT);
-    const fillWidth = 345 * progress;
+    const fillWidth = 345 * Math.max(0, progress);
 
     if (fillWidth > 0) {
       this.progressBarFill.rect(0, 0, fillWidth, 10);
@@ -222,61 +378,22 @@ export class PlayingScene extends Scene {
     }
   }
 
-  private startTimer(): void {
-    this.stopTimer();
-
-    this.timeLeft = GAME_CONFIG.TIME_LIMIT;
-    this.isTimerRunning = true;
-
-    this.timer = window.setInterval(() => {
-      this.timeLeft -= 100;
-      this.updateProgressBar();
-    }, 100);
-  }
-
-  private stopTimer(): void {
-    if (this.timer) {
-      clearInterval(this.timer);
-      this.timer = 0;
-    }
-    this.isTimerRunning = false;
-  }
-
-  private onTimerOut(): void {
-    this.stopTimer();
-
-    // TODO: 여기에 시간 초과 로직 추가
-    // 예: 게임 상태를 'timeout'으로 변경
-  }
-
   public reset(): void {
     super.reset();
-    this.stopTimer();
-    this.timeLeft = GAME_CONFIG.TIME_LIMIT;
-    if (this.progressBarFill) {
-      this.updateProgressBar();
-    }
+    this.gameController.cleanup();
   }
 
   public pause(): void {
     super.pause();
-    this.stopTimer();
     console.log("⏸️ PlayingScene paused");
   }
 
   public resume(): void {
     super.resume();
-    if (this.timeLeft > 0) {
-      this.startTimer();
-    }
     console.log("▶️ PlayingScene resumed");
   }
 
-  /**
-   * 매 프레임마다 호출되는 업데이트 (필요시 사용)
-   */
   public update(_deltaTime: number): void {
     super.update(_deltaTime);
-    // 현재는 타이머로 처리하므로 특별한 업데이트 로직 없음
   }
 }
