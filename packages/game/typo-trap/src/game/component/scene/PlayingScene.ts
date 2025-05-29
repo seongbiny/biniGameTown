@@ -489,10 +489,11 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
     this.successMessageText = new Text({
       text: "",
       style: {
+        fontFamily: "Pretendard",
         fontSize: 24,
         fill: 0x000000,
         align: "center",
-        fontWeight: "bold",
+        fontWeight: "600",
       },
     });
     this.successMessageText.anchor.set(0.5);
@@ -509,9 +510,11 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
     this.messageText = new Text({
       text: "",
       style: {
+        fontFamily: "Pretendard",
         fontSize: 24,
         fill: 0x000000,
         align: "center",
+        fontWeight: "600",
       },
     });
     this.messageText.anchor.set(0.5);
@@ -530,9 +533,11 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
     this.buttonText = new Text({
       text: "",
       style: {
+        fontFamily: "Pretendard",
         fontSize: 20,
         fill: 0xffffff,
         align: "center",
+        fontWeight: "600",
       },
     });
 
@@ -640,10 +645,11 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
     const text = new Text({
       text: word,
       style: {
+        fontFamily: "Pretendard",
         fontSize: fontSize,
         fill: 0x000000,
         align: "center",
-        fontWeight: "bold",
+        fontWeight: "700",
       },
     });
     text.anchor.set(0.5);

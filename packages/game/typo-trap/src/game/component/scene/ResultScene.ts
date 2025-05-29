@@ -46,9 +46,11 @@ export class ResultScene extends Scene {
     this.congratulationText = new Text({
       text: "축하해요!",
       style: {
+        fontFamily: "Pretendard",
         fontSize: 32,
         fill: 0x000000,
         align: "center",
+        fontWeight: "600",
       },
     });
 
@@ -65,9 +67,11 @@ export class ResultScene extends Scene {
     this.recordText = new Text({
       text: "00초를 기록했어요",
       style: {
+        fontFamily: "Pretendard",
         fontSize: 32,
         fill: 0x000000,
         align: "center",
+        fontWeight: "600",
       },
     });
 
@@ -85,8 +89,10 @@ export class ResultScene extends Scene {
     this.shareButton.x = this.screenWidth / 2;
     this.shareButton.y = this.screenHeight - 80;
 
-    this.shareButton.roundRect(-120, -25, 240, 50, 25);
-    this.shareButton.fill(0x333333);
+    // PlayingScene과 동일한 스타일 적용
+    this.shareButton.roundRect(-205, -25, 410, 50, 10); // width: 410, height: 50, radius: 10
+    this.shareButton.fill(0x353739); // PlayingScene과 동일한 색상
+    this.shareButton.stroke({ width: 2, color: 0x353739 }); // stroke 추가
 
     this.shareButton.eventMode = "static";
     this.shareButton.cursor = "pointer";
@@ -95,9 +101,11 @@ export class ResultScene extends Scene {
     this.shareButtonText = new Text({
       text: "친구에게 자랑하기",
       style: {
-        fontSize: 20,
-        fill: 0xffffff,
+        fontFamily: "Pretendard",
+        fontSize: 20, // PlayingScene과 동일
+        fill: 0xffffff, // PlayingScene과 동일
         align: "center",
+        fontWeight: "600",
       },
     });
 

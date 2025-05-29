@@ -3,6 +3,8 @@ import { calculateStageSize } from "./game/utils/calculateStageSize";
 import SceneController from "./game/core/SceneController";
 import { assetsPreload } from "./assets/assetsPreload";
 
+import "./fonts.css";
+
 export class App {
   private app: Application = new Application();
 

@@ -22,10 +22,11 @@ export class ReadyScene extends Scene {
     this.titleText = new Text({
       text: "다르게 적힌 글자를\n찾아주세요",
       style: {
+        fontFamily: "Pretendard",
         fontSize: 28,
         fill: 0x000000,
         align: "center",
-        fontWeight: "bolder",
+        fontWeight: "600",
       },
     });
 
@@ -51,6 +52,8 @@ export class ReadyScene extends Scene {
         fontSize: 48,
         fill: 0xffffff,
         align: "center",
+        fontFamily: "Pretendard",
+        fontWeight: "400",
       },
     });
 
@@ -98,6 +101,7 @@ export class ReadyScene extends Scene {
     // 게임 매니저에 게임 시작 알림
     console.log("카운트다운 완료! 게임 시작");
 
+    // SceneController.getInstance().switchScene(SceneType.RESULT);
     SceneController.getInstance().switchScene(SceneType.PLAYING);
   }
 
