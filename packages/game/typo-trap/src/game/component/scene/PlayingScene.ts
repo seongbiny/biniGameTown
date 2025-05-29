@@ -173,7 +173,13 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
     // 프로그레스바 숨기고 상단에 시간 초과 메시지 표시
     this.progressBarContainer.visible = false;
     this.successMessageText.text = data.topMessage;
-    this.successMessageText.style.fill = 0xff9800; // 주황색으로 변경
+    this.successMessageText.style.fill = 0x000000;
+    this.successMessageText.style.fontSize = 24;
+
+    const gridTopY = (this.screenHeight - 500) / 2;
+    const messageY = gridTopY / 2;
+    this.successMessageText.y = messageY;
+
     this.successMessageText.visible = true;
 
     // 하단에 버튼만 표시
@@ -223,7 +229,13 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
     // 프로그레스바 숨기고 상단에 오답 메시지 표시
     this.progressBarContainer.visible = false;
     this.successMessageText.text = data.topMessage;
-    this.successMessageText.style.fill = 0xf69f9f; // 연분홍색으로 변경
+    this.successMessageText.style.fill = 0x000000;
+    this.successMessageText.style.fontSize = 24;
+
+    const gridTopY = (this.screenHeight - 500) / 2;
+    const messageY = gridTopY / 2;
+    this.successMessageText.y = messageY;
+
     this.successMessageText.visible = true;
 
     // 하단에 버튼만 표시
@@ -292,6 +304,14 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
   private showSuccessMessage(message: string): void {
     this.progressBarContainer.visible = false;
     this.successMessageText.text = message;
+    this.successMessageText.style.fill = 0x000000;
+    this.successMessageText.style.fontSize = 24;
+
+    // 그리드와 화면 상단 사이의 가운데 위치
+    const gridTopY = (this.screenHeight - 500) / 2;
+    const messageY = gridTopY / 2;
+    this.successMessageText.y = messageY;
+
     this.successMessageText.visible = true;
     this.stateUIContainer.visible = false;
   }
@@ -301,8 +321,18 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
     buttonText: string,
     buttonColor: number
   ): void {
-    // 상단 메시지 변경
+    this.progressBarContainer.visible = false;
+
+    // 상단 메시지 설정
     this.successMessageText.text = topMessage;
+    this.successMessageText.style.fill = 0x000000;
+    this.successMessageText.style.fontSize = 24;
+
+    // 그리드와 화면 상단 사이의 가운데 위치
+    const gridTopY = (this.screenHeight - 500) / 2;
+    const messageY = gridTopY / 2;
+    this.successMessageText.y = messageY;
+
     this.successMessageText.visible = true;
 
     // 하단에 버튼만 표시 (메시지는 비우기)
@@ -332,7 +362,7 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
       text: "",
       style: {
         fontSize: 24,
-        fill: 0x4caf50, // 초록색
+        fill: 0x000000,
         align: "center",
         fontWeight: "bold",
       },
@@ -407,11 +437,11 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
     this.progressBarContainer = new Container();
     this.addChild(this.progressBarContainer);
 
-    this.progressBarContainer.x = (this.screenWidth - 345) / 2;
+    this.progressBarContainer.x = (this.screenWidth - 410) / 2;
     this.progressBarContainer.y = 34;
 
     this.progressBarBg = new Graphics();
-    this.progressBarBg.rect(0, 0, 345, 10);
+    this.progressBarBg.rect(0, 0, 410, 10);
     this.progressBarBg.fill(0xd9d9d9);
 
     this.progressBarFill = new Graphics();
@@ -475,7 +505,7 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
     const bg = new Graphics();
     bg.roundRect(0, 0, width, height, 20);
     bg.fill(0xffffff);
-    bg.stroke({ width: 2, color: 0xe9e9e9 });
+    bg.stroke({ width: 1, color: 0xe9e9e9 });
 
     const fontSize = this.STAGE_FONT_SIZES[stage - 1];
 
@@ -541,7 +571,7 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
       bg.clear();
       bg.roundRect(0, 0, dimensions.width, dimensions.height, 20);
       bg.fill(0xffffff);
-      bg.stroke({ width: 2, color: 0xe9e9e9 });
+      bg.stroke({ width: 1, color: 0xe9e9e9 });
     }
   }
 
@@ -578,11 +608,14 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
     }
 
     this.actionButton.clear();
-    this.actionButton.roundRect(-80, -20, 160, 40, 20);
-    this.actionButton.fill(buttonColor);
-    this.actionButton.stroke({ width: 2, color: buttonColor });
+    this.actionButton.roundRect(-205, -25, 410, 50, 10);
+    this.actionButton.fill(0x353739);
+    this.actionButton.stroke({ width: 2, color: 0x353739 });
 
     this.buttonText.text = buttonText;
+    this.buttonText.style.fill = 0xffffff;
+    this.buttonText.style.fontSize = 20;
+
     this.stateUIContainer.visible = true;
   }
 
@@ -597,7 +630,7 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
   private updateProgressBar(progress: number = 1.0): void {
     this.progressBarFill.clear();
 
-    const fillWidth = 345 * Math.max(0, Math.min(1, progress)); // progress를 0-1로 제한
+    const fillWidth = 410 * Math.max(0, Math.min(1, progress)); // progress를 0-1로 제한
 
     if (fillWidth > 0) {
       this.progressBarFill.rect(0, 0, fillWidth, 10);

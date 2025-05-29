@@ -25,6 +25,7 @@ export class ReadyScene extends Scene {
         fontSize: 28,
         fill: 0x000000,
         align: "center",
+        fontWeight: "bolder",
       },
     });
 
