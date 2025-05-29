@@ -162,17 +162,21 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
       case PlayingState.PLAYING:
         this.showGameUI();
         this.clearAllCellSelections();
+        this.enableGridInteraction(); // 플레이 중일 때만 그리드 터치 가능
         break;
 
       case PlayingState.SUCCESS:
+        this.disableGridInteraction(); // 성공 시 그리드 터치 비활성화
         this.handleSuccessState(data);
         break;
 
       case PlayingState.TIMEOUT:
+        this.disableGridInteraction(); // 시간 초과 시 그리드 터치 비활성화
         this.handleTimeoutState(data);
         break;
 
       case PlayingState.WRONG:
+        this.disableGridInteraction(); // 오답 시 그리드 터치 비활성화
         this.handleWrongState(data);
         break;
     }
@@ -216,9 +220,9 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
         break;
 
       case "final_complete":
-        // 5단계 성공 시 ResultScene으로 자동 전환
-        console.log("🎉 5단계 완료! ResultScene으로 전환");
-        SceneController.getInstance().switchScene("RESULT");
+        setTimeout(() => {
+          SceneController.getInstance().switchScene("RESULT");
+        }, 3000);
         break;
 
       case "all_complete":
@@ -238,6 +242,22 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
       document.body.removeChild(this.animationContainer);
       this.animationContainer = null;
     }
+  }
+
+  private enableGridInteraction(): void {
+    this.gridCells.forEach((cell) => {
+      cell.eventMode = "static";
+      cell.cursor = "pointer";
+    });
+    console.log("✅ 그리드 터치 활성화");
+  }
+
+  private disableGridInteraction(): void {
+    this.gridCells.forEach((cell) => {
+      cell.eventMode = "none";
+      cell.cursor = "default";
+    });
+    console.log("❌ 그리드 터치 비활성화");
   }
 
   private playSuccessAnimation(): void {
@@ -466,15 +486,6 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
     this.showStateUI("", buttonText, buttonColor);
   }
 
-  private showNextStageConfirm(
-    message: string,
-    buttonText: string,
-    buttonColor: number
-  ): void {
-    // 성공 메시지는 그대로 두고, 하단에 확인 UI 표시
-    this.showStateUI(message, buttonText, buttonColor);
-  }
-
   public onTimerUpdate(timeLeft: number, progress: number): void {
     this.updateProgressBar(progress);
   }
@@ -680,6 +691,12 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
     col: number,
     cellContainer: Container
   ): void {
+    // 현재 게임 상태가 PLAYING이 아니면 클릭 무시
+    if (this.gameController.getGameState() !== PlayingState.PLAYING) {
+      console.log("🚫 게임이 진행 중이 아니므로 클릭 무시");
+      return;
+    }
+
     console.log(`🎯 Cell clicked: (${row}, ${col})`);
 
     this.updateCellSelection(cellContainer);
