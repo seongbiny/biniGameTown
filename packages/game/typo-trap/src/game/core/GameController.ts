@@ -77,18 +77,32 @@ export class GameController {
   }
 
   private handleSuccess(): void {
+    const isLastStage = this.currentStage >= GAME_CONFIG.STAGE_COUNT;
+
     const resultData = {
       stage: "success_message",
       message: `${this.currentStage}단계 성공!`,
       currentStage: this.currentStage,
-      isLastStage: this.currentStage >= GAME_CONFIG.STAGE_COUNT,
+      isLastStage: isLastStage,
     };
 
     this.callbacks?.onStateChange(this.gameState, resultData);
 
-    setTimeout(() => {
-      this.showNextStageConfirm();
-    }, 1000);
+    if (isLastStage) {
+      // 5단계(마지막 단계) 성공 시 1초 후 ResultScene으로 자동 전환
+      console.log("🎊 5단계 성공! 1초 후 ResultScene으로 전환");
+      setTimeout(() => {
+        this.callbacks?.onStateChange(this.gameState, {
+          stage: "final_complete",
+          shouldTransitionToResult: true,
+        });
+      }, 1000);
+    } else {
+      // 1~4단계는 기존 로직대로
+      setTimeout(() => {
+        this.showNextStageConfirm();
+      }, 1000);
+    }
   }
 
   private showNextStageConfirm(): void {
@@ -98,20 +112,9 @@ export class GameController {
         stage: "next_stage_confirm",
         topMessage: `${nextStage}단계도 바로\n도전해 볼까요?`, // 상단 메시지
         buttonText: `${nextStage}단계 도전하기`,
-        buttonColor: 0x4caf50,
+        buttonColor: 0x353739,
         currentStage: this.currentStage,
         nextStage: nextStage,
-      };
-
-      this.callbacks?.onStateChange(this.gameState, resultData);
-    } else {
-      // 마지막 단계인 경우
-      const resultData = {
-        stage: "all_complete",
-        topMessage: "모든 단계 완료! 🎉\n축하합니다!",
-        buttonText: "결과 보기",
-        buttonColor: 0x4caf50,
-        currentStage: this.currentStage,
       };
 
       this.callbacks?.onStateChange(this.gameState, resultData);

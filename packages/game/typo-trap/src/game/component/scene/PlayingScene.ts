@@ -215,6 +215,12 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
         );
         break;
 
+      case "final_complete":
+        // 5단계 성공 시 ResultScene으로 자동 전환
+        console.log("🎉 5단계 완료! ResultScene으로 전환");
+        SceneController.getInstance().switchScene("RESULT");
+        break;
+
       case "all_complete":
         // 모든 단계 완료
         this.showNextStageUI(
@@ -226,6 +232,14 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
     }
   }
 
+  private removeSuccessAnimation(): void {
+    if (this.animationContainer) {
+      console.log("🗑️ lottie 애니메이션 강제 제거");
+      document.body.removeChild(this.animationContainer);
+      this.animationContainer = null;
+    }
+  }
+
   private playSuccessAnimation(): void {
     const animationData = getAnimationData();
     if (!animationData) {
@@ -234,16 +248,13 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
     }
 
     // 기존 애니메이션 컨테이너가 있으면 제거
-    if (this.animationContainer) {
-      document.body.removeChild(this.animationContainer);
-      this.animationContainer = null;
-    }
+    this.removeSuccessAnimation();
 
     // 애니메이션 컨테이너 생성
     this.animationContainer = document.createElement("div");
 
     // stage의 scale 값 가져오기
-    const stageScale = this.parent.scale.x; // stage의 스케일 값
+    const stageScale = this.parent.scale.x;
 
     // 기본 게임 크기 (450 * 800)에 스케일 적용
     const baseWidth = 450;
@@ -297,10 +308,7 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
     // 애니메이션 완료 후 컨테이너 제거
     animation.addEventListener("complete", () => {
       console.log("✅ lottie 애니메이션 완료!");
-      if (this.animationContainer) {
-        document.body.removeChild(this.animationContainer);
-        this.animationContainer = null;
-      }
+      this.removeSuccessAnimation();
     });
 
     // 창 크기 조정 시 애니메이션 크기 및 위치 업데이트
@@ -413,6 +421,8 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
   }
 
   private showGameUI(): void {
+    this.removeSuccessAnimation();
+
     this.progressBarContainer.visible = true;
     this.successMessageText.visible = false;
     this.stateUIContainer.visible = false;
@@ -471,6 +481,7 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
 
   public onStageChange(stage: number): void {
     console.log(`🎯 Stage changed to: ${stage}`);
+    this.removeSuccessAnimation();
     this.createGridForStage(stage);
   }
 
@@ -776,6 +787,8 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
       this.animationContainer = null;
     }
 
+    this.removeSuccessAnimation();
+
     // GameController 정리
     this.gameController.cleanup();
 
@@ -802,6 +815,8 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
       document.body.removeChild(this.animationContainer);
       this.animationContainer = null;
     }
+
+    this.removeSuccessAnimation();
 
     // GameController 정리 (타이머 정지 등)
     this.gameController.cleanup();
