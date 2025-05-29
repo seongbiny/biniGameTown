@@ -4,7 +4,8 @@ import { GAME_CONFIG, PlayingState } from "../../types";
 import SceneController from "../../core/SceneController";
 import { GameController } from "../../core/GameController";
 import type { GameEventCallbacks } from "../../core/GameController";
-
+import { getAnimationData } from "../../../assets/assetsPreload";
+import lottie from "lottie-web";
 export class PlayingScene extends Scene implements GameEventCallbacks {
   private progressBarContainer!: Container;
   private progressBarBg!: Graphics;
@@ -22,6 +23,8 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
 
   private selectedCell: Container | null = null;
   private gameController: GameController;
+
+  private animationContainer: HTMLDivElement | null = null;
 
   private readonly STAGE_GAPS = [10, 7, 5, 3, 3];
 
@@ -125,6 +128,14 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
     ],
   ];
 
+  private readonly CORRECT_POSITIONS = [
+    { row: 0, col: 1 }, // 1단계: "재쵹"
+    { row: 2, col: 2 }, // 2단계: "휸민정음"
+    { row: 0, col: 2 }, // 3단계: "새종대왕"
+    { row: 4, col: 3 }, // 4단계: "댸한\n민국\n만세"
+    { row: 4, col: 3 }, // 5단계: "걔미\n허리\n왕잠\n자리"
+  ];
+
   constructor(parent: Container) {
     super(parent);
     this.gameController = GameController.getInstance();
@@ -213,6 +224,112 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
         );
         break;
     }
+  }
+
+  private playSuccessAnimation(): void {
+    const animationData = getAnimationData();
+    if (!animationData) {
+      console.warn("🚨 success.json lottie 데이터를 찾을 수 없습니다.");
+      return;
+    }
+
+    // 기존 애니메이션 컨테이너가 있으면 제거
+    if (this.animationContainer) {
+      document.body.removeChild(this.animationContainer);
+      this.animationContainer = null;
+    }
+
+    // 애니메이션 컨테이너 생성
+    this.animationContainer = document.createElement("div");
+
+    // stage의 scale 값 가져오기
+    const stageScale = this.parent.scale.x; // stage의 스케일 값
+
+    // 기본 게임 크기 (450 * 800)에 스케일 적용
+    const baseWidth = 450;
+    const baseHeight = 800;
+    const scaledWidth = baseWidth * stageScale;
+    const scaledHeight = baseHeight * stageScale;
+
+    // 게임 캔버스의 위치 정보 가져오기
+    const canvas = document.querySelector("canvas");
+    if (!canvas) {
+      console.error("캔버스 요소를 찾을 수 없습니다.");
+      return;
+    }
+
+    const canvasRect = canvas.getBoundingClientRect();
+    const centerX = canvasRect.left + canvasRect.width / 2;
+    const centerY = canvasRect.top + canvasRect.height / 2;
+
+    // 애니메이션 컨테이너 스타일 설정
+    this.animationContainer.style.position = "fixed";
+    this.animationContainer.style.left = `${centerX}px`;
+    this.animationContainer.style.top = `${centerY}px`;
+    this.animationContainer.style.transform = "translate(-50%, -50%)";
+    this.animationContainer.style.width = `${scaledWidth}px`;
+    this.animationContainer.style.height = `${scaledHeight}px`;
+    this.animationContainer.style.zIndex = "1000";
+    this.animationContainer.style.pointerEvents = "none";
+    this.animationContainer.style.display = "flex";
+    this.animationContainer.style.alignItems = "center";
+    this.animationContainer.style.justifyContent = "center";
+    document.body.appendChild(this.animationContainer);
+
+    console.log("🎊 lottie 애니메이션 시작!", {
+      baseSize: `${baseWidth}x${baseHeight}`,
+      scale: stageScale,
+      scaledSize: `${scaledWidth}x${scaledHeight}`,
+      canvasSize: `${canvasRect.width}x${canvasRect.height}`,
+    });
+
+    const animation = lottie.loadAnimation({
+      container: this.animationContainer,
+      renderer: "svg",
+      loop: false,
+      autoplay: true,
+      animationData: animationData,
+      rendererSettings: {
+        preserveAspectRatio: "xMidYMid meet",
+      },
+    });
+
+    // 애니메이션 완료 후 컨테이너 제거
+    animation.addEventListener("complete", () => {
+      console.log("✅ lottie 애니메이션 완료!");
+      if (this.animationContainer) {
+        document.body.removeChild(this.animationContainer);
+        this.animationContainer = null;
+      }
+    });
+
+    // 창 크기 조정 시 애니메이션 크기 및 위치 업데이트
+    const updateSizeAndPosition = () => {
+      if (this.animationContainer && canvas) {
+        const newStageScale = this.parent.scale.x;
+        const newScaledWidth = baseWidth * newStageScale;
+        const newScaledHeight = baseHeight * newStageScale;
+
+        const newCanvasRect = canvas.getBoundingClientRect();
+        const newCenterX = newCanvasRect.left + newCanvasRect.width / 2;
+        const newCenterY = newCanvasRect.top + newCanvasRect.height / 2;
+
+        this.animationContainer.style.left = `${newCenterX}px`;
+        this.animationContainer.style.top = `${newCenterY}px`;
+        this.animationContainer.style.width = `${newScaledWidth}px`;
+        this.animationContainer.style.height = `${newScaledHeight}px`;
+
+        console.log("🔄 lottie 크기 업데이트:", {
+          scale: newStageScale,
+          size: `${newScaledWidth}x${newScaledHeight}`,
+        });
+      }
+    };
+
+    window.addEventListener("resize", updateSizeAndPosition);
+    animation.addEventListener("complete", () => {
+      window.removeEventListener("resize", updateSizeAndPosition);
+    });
   }
 
   private handleWrongState(data: any): void {
@@ -550,6 +667,19 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
 
     this.updateCellSelection(cellContainer);
 
+    // 현재 단계 가져오기
+    const currentStage = this.gameController.getCurrentStage();
+    const correctPos = this.CORRECT_POSITIONS[currentStage - 1];
+
+    // 정답인지 즉시 판단
+    const isCorrect = row === correctPos.row && col === correctPos.col;
+
+    if (isCorrect) {
+      // 정답이면 즉시 lottie 애니메이션 재생
+      console.log("🎉 정답! lottie 애니메이션 재생");
+      this.playSuccessAnimation();
+    }
+
     // GameManager에게 클릭 이벤트 전달
     this.gameController.handleCellClick(row, col);
   }
@@ -641,6 +771,11 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
   public reset(): void {
     super.reset();
 
+    if (this.animationContainer) {
+      document.body.removeChild(this.animationContainer);
+      this.animationContainer = null;
+    }
+
     // GameController 정리
     this.gameController.cleanup();
 
@@ -662,6 +797,11 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
 
   public pause(): void {
     super.pause();
+
+    if (this.animationContainer) {
+      document.body.removeChild(this.animationContainer);
+      this.animationContainer = null;
+    }
 
     // GameController 정리 (타이머 정지 등)
     this.gameController.cleanup();
