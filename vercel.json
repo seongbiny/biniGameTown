@@ -11,6 +11,10 @@
       "source": "/game/flappy-plane/:path*",
       "destination": "/game/flappy-plane/:path*"
     },
+    {
+      "source": "/game/typo-trap/:path*",
+      "destination": "/game/typo-trap/:path*"
+    },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
