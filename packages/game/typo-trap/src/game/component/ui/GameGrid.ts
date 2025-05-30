@@ -1,5 +1,7 @@
-import { Container, Graphics, Text } from "pixi.js";
+import { Container } from "pixi.js";
 import { GAME_CONFIG } from "../../types";
+import { GridCell, CellState } from "./GridCell";
+import type { GridCellConfig, GridCellCallbacks } from "./GridCell";
 
 export interface Position {
   row: number;
@@ -23,9 +25,9 @@ export interface GameGridConfig {
   y: number;
 }
 
-export class GameGrid extends Container {
-  private gridCells: Container[] = [];
-  private selectedCell: Container | null = null;
+export class GameGrid extends Container implements GridCellCallbacks {
+  private gridCells: GridCell[] = [];
+  private selectedCell: GridCell | null = null;
   private currentStage: number = 1;
   private isInteractionEnabled: boolean = true;
 
@@ -104,6 +106,7 @@ export class GameGrid extends Container {
 
     const gridSize = GAME_CONFIG.GRID_SIZES[stage - 1];
     const gap = this.STAGE_GAPS[stage - 1];
+    const fontSize = this.STAGE_FONT_SIZES[stage - 1];
 
     const cellWidth = (this.config.width - gap * (gridSize - 1)) / gridSize;
     const cellHeight = (this.config.height - gap * (gridSize - 1)) / gridSize;
@@ -114,102 +117,60 @@ export class GameGrid extends Container {
         const y = row * (cellHeight + gap);
         const word = this.stageWords[stage - 1][row][col];
 
-        const cell = this.createGridCell(
+        const cellConfig: GridCellConfig = {
           x,
           y,
-          cellWidth,
-          cellHeight,
+          width: cellWidth,
+          height: cellHeight,
+          word,
+          fontSize,
           row,
           col,
-          word,
-          stage
-        );
+        };
+
+        const cellCallbacks: GridCellCallbacks = {
+          onCellClick: this.onCellClick.bind(this),
+        };
+
+        const cell = new GridCell(cellConfig, cellCallbacks);
         this.addChild(cell);
         this.gridCells.push(cell);
       }
     }
+
+    console.log(
+      `🎮 GameGrid created ${this.gridCells.length} cells for stage ${stage}`
+    );
   }
 
-  private createGridCell(
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    row: number,
-    col: number,
-    word: string,
-    stage: number
-  ): Container {
-    const bg = new Graphics();
-    bg.roundRect(0, 0, width, height, 20);
-    bg.fill(0xffffff);
-    bg.stroke({ width: 1, color: 0xe9e9e9 });
-
-    const fontSize = this.STAGE_FONT_SIZES[stage - 1];
-
-    const text = new Text({
-      text: word,
-      style: {
-        fontFamily: "Pretendard",
-        fontSize: fontSize,
-        fill: 0x000000,
-        align: "center",
-        fontWeight: "700",
-      },
-    });
-    text.anchor.set(0.5);
-    text.x = width / 2;
-    text.y = height / 2;
-
-    const container = new Container();
-    container.addChild(bg, text);
-    container.x = x;
-    container.y = y;
-
-    container.eventMode = "static";
-    container.cursor = "pointer";
-
-    container.on("pointerdown", () => {
-      this.onCellClick(row, col, container);
-    });
-
-    (container as any).gridPosition = { row, col };
-    (container as any).background = bg;
-    (container as any).cellDimensions = { width, height };
-
-    return container;
-  }
-
-  private onCellClick(
-    row: number,
-    col: number,
-    cellContainer: Container
-  ): void {
+  // GridCellCallbacks 인터페이스 구현
+  public onCellClick(row: number, col: number, cell: GridCell): void {
     if (!this.isInteractionEnabled) {
       console.log("🚫 그리드 상호작용이 비활성화됨");
       return;
     }
 
-    console.log(`🎯 GameGrid cell clicked: (${row}, ${col})`);
+    console.log(`🎯 GameGrid received cell click: (${row}, ${col})`);
 
-    this.updateCellSelection(cellContainer);
+    this.updateCellSelection(cell);
     this.callbacks.onCellClick(row, col);
   }
 
-  private updateCellSelection(newSelectedCell: Container): void {
-    if (this.selectedCell) {
-      this.resetCellStyle(this.selectedCell);
+  private updateCellSelection(newSelectedCell: GridCell): void {
+    // 이전 선택된 셀을 기본 상태로 되돌리기
+    if (this.selectedCell && this.selectedCell !== newSelectedCell) {
+      this.selectedCell.setState(CellState.DEFAULT);
     }
 
-    this.applyCellSelectedStyle(newSelectedCell);
+    // 새로운 셀을 선택 상태로 설정
+    newSelectedCell.setState(CellState.SELECTED);
     this.selectedCell = newSelectedCell;
   }
 
   public enableInteraction(): void {
     this.isInteractionEnabled = true;
     this.gridCells.forEach((cell) => {
-      cell.eventMode = "static";
-      cell.cursor = "pointer";
+      cell.enableInteraction();
     });
     console.log("✅ GameGrid 상호작용 활성화");
   }
@@ -217,8 +178,7 @@ export class GameGrid extends Container {
   public disableInteraction(): void {
     this.isInteractionEnabled = false;
     this.gridCells.forEach((cell) => {
-      cell.eventMode = "none";
-      cell.cursor = "default";
+      cell.disableInteraction();
     });
     console.log("❌ GameGrid 상호작용 비활성화");
   }
@@ -228,23 +188,20 @@ export class GameGrid extends Container {
     correctPos: Position
   ): void {
     this.gridCells.forEach((cell) => {
-      const position = (cell as any).gridPosition;
+      const cellPos = cell.getPosition();
 
-      if (
-        position.row === selectedPos.row &&
-        position.col === selectedPos.col
-      ) {
+      if (cellPos.row === selectedPos.row && cellPos.col === selectedPos.col) {
         // 선택한 셀 (틀린 답) - 연분홍색
-        this.applyCellWrongStyle(cell);
+        cell.setState(CellState.WRONG);
       } else if (
-        position.row === correctPos.row &&
-        position.col === correctPos.col
+        cellPos.row === correctPos.row &&
+        cellPos.col === correctPos.col
       ) {
         // 정답 셀 - 검은색
-        this.applyCellCorrectStyle(cell);
+        cell.setState(CellState.CORRECT);
       } else {
         // 나머지 셀들은 기본 스타일로
-        this.resetCellStyle(cell);
+        cell.setState(CellState.DEFAULT);
       }
     });
 
@@ -254,57 +211,26 @@ export class GameGrid extends Container {
 
   public clearAllSelections(): void {
     this.gridCells.forEach((cell) => {
-      this.resetCellStyle(cell);
+      cell.setState(CellState.DEFAULT);
     });
     this.selectedCell = null;
   }
 
-  private resetCellStyle(cell: Container): void {
-    const bg = (cell as any).background as Graphics;
-    const dimensions = (cell as any).cellDimensions;
-
-    if (bg && dimensions) {
-      bg.clear();
-      bg.roundRect(0, 0, dimensions.width, dimensions.height, 20);
-      bg.fill(0xffffff);
-      bg.stroke({ width: 1, color: 0xe9e9e9 });
-    }
+  public findCellAt(row: number, col: number): GridCell | null {
+    return (
+      this.gridCells.find((cell) => {
+        const pos = cell.getPosition();
+        return pos.row === row && pos.col === col;
+      }) || null
+    );
   }
 
-  private applyCellSelectedStyle(cell: Container): void {
-    const bg = (cell as any).background as Graphics;
-    const dimensions = (cell as any).cellDimensions;
-
-    if (bg && dimensions) {
-      bg.clear();
-      bg.roundRect(0, 0, dimensions.width, dimensions.height, 20);
-      bg.fill(0xffffff);
-      bg.stroke({ width: 3, color: 0x000000 });
-    }
+  public getSelectedCell(): GridCell | null {
+    return this.selectedCell;
   }
 
-  private applyCellWrongStyle(cell: Container): void {
-    const bg = (cell as any).background as Graphics;
-    const dimensions = (cell as any).cellDimensions;
-
-    if (bg && dimensions) {
-      bg.clear();
-      bg.roundRect(0, 0, dimensions.width, dimensions.height, 20);
-      bg.fill(0xffffff);
-      bg.stroke({ width: 3, color: 0xf69f9f }); // 연분홍색
-    }
-  }
-
-  private applyCellCorrectStyle(cell: Container): void {
-    const bg = (cell as any).background as Graphics;
-    const dimensions = (cell as any).cellDimensions;
-
-    if (bg && dimensions) {
-      bg.clear();
-      bg.roundRect(0, 0, dimensions.width, dimensions.height, 20);
-      bg.fill(0xffffff);
-      bg.stroke({ width: 3, color: 0x000000 }); // 검은색
-    }
+  public getAllCells(): GridCell[] {
+    return [...this.gridCells]; // 복사본 반환
   }
 
   private clearGrid(): void {
@@ -322,5 +248,13 @@ export class GameGrid extends Container {
     this.currentStage = 1;
     this.isInteractionEnabled = true;
     console.log("🔄 GameGrid 리셋 완료");
+  }
+
+  // 디버깅 메서드
+  public getDebugInfo(): string {
+    const cellInfo = this.gridCells
+      .map((cell) => cell.getDebugInfo())
+      .join("\n");
+    return `GameGrid Stage ${this.currentStage}:\n${cellInfo}`;
   }
 }
