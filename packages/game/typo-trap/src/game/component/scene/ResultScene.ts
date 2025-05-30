@@ -44,7 +44,7 @@ export class ResultScene extends Scene {
 
   private createCongratulationText(): void {
     this.congratulationText = new Text({
-      text: "축하해요!",
+      text: "세종대왕:",
       style: {
         fontFamily: "Pretendard",
         fontSize: 32,
@@ -65,7 +65,7 @@ export class ResultScene extends Scene {
 
   private createRecordText(): void {
     this.recordText = new Text({
-      text: "00초를 기록했어요",
+      text: "칭찬할게",
       style: {
         fontFamily: "Pretendard",
         fontSize: 32,
