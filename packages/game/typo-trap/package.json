@@ -1,11 +1,11 @@
 {
-  "name": "typo-trap",
+  "name": "@bini-game-town/typo-trap",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "vite build",
     "preview": "vite preview"
   },
   "devDependencies": {

@@ -19,6 +19,13 @@ function App() {
         >
           flappy-plane
         </a>
+        <a
+          href="/game/typo-trap/"
+          target="_self"
+          className="w-36 h-24 bg-blue-100 border-2 border-blue-500 rounded-lg flex items-center justify-center text-lg font-semibold hover:bg-blue-200 transition"
+        >
+          typo-trap
+        </a>
       </div>
     </div>
   );
