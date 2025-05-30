@@ -1,6 +1,6 @@
 import { Container, Graphics, Text } from "pixi.js";
 import { Scene } from "./Scene";
-import { GAME_CONFIG, PlayingState } from "../../types";
+import { PlayingState } from "../../types";
 import SceneController from "../../core/SceneController";
 import { GameController } from "../../core/GameController";
 import type { GameEventCallbacks } from "../../core/GameController";
@@ -8,11 +8,15 @@ import { getAnimationData } from "../../../assets/assetsPreload";
 import lottie from "lottie-web";
 import { ProgressBar } from "../ui/ProgressBar";
 import type { ProgressBarConfig } from "../ui/ProgressBar";
+import { GameGrid } from "../ui/GameGrid";
+import type {
+  GameGridConfig,
+  GameGridCallbacks,
+  Position,
+} from "../ui/GameGrid";
 export class PlayingScene extends Scene implements GameEventCallbacks {
   private progressBar!: ProgressBar;
-
-  private gridContainer!: Container;
-  private gridCells: Container[] = [];
+  private gameGrid!: GameGrid;
 
   private stateUIContainer!: Container;
   private messageText!: Text;
@@ -21,39 +25,9 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
 
   private successMessageText!: Text;
 
-  private selectedCell: Container | null = null;
   private gameController: GameController;
 
   private animationContainer: HTMLDivElement | null = null;
-
-  private readonly STAGE_GAPS = [10, 7, 5, 3, 3];
-
-  private readonly STAGE_FONT_SIZES = [
-    32, // 1단계: 2x2 - 큰 폰트
-    28, // 2단계: 3x3 - 중간 폰트
-    24, // 3단계: 4x4 - 기본 폰트
-    20, // 4단계: 5x5 - 작은 폰트
-    18, // 5단계: 5x5 - 더 작은 폰트
-  ];
-
-  private readonly STAGE_BASE_DATA = [
-    { correctWord: "재촉", typoWord: "재쵹", gridSize: 2 },
-    { correctWord: "훈민정음", typoWord: "휸민정음", gridSize: 3 },
-    { correctWord: "세종대왕", typoWord: "새종대왕", gridSize: 4 },
-    {
-      correctWord: "대한\n민국\n만세",
-      typoWord: "댸한\n민국\n만세",
-      gridSize: 5,
-    },
-    {
-      correctWord: "개미\n허리\n왕잠\n자리",
-      typoWord: "걔미\n허리\n왕잠\n자리",
-      gridSize: 5,
-    },
-  ];
-
-  private STAGE_WORDS: string[][][] = [];
-  private CORRECT_POSITIONS: { row: number; col: number }[] = [];
 
   constructor(parent: Container) {
     super(parent);
@@ -63,53 +37,59 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
   public initialize(): void {
     super.initialize();
 
-    this.generateRandomizedStageWords();
-
     this.createProgressBar();
+    this.createGameGrid();
     this.createSuccessMessage();
     this.createStateUI();
-    this.createGrid();
 
     // GameManager 초기화 및 콜백 설정
     this.gameController.initialize(this);
+
+    const correctPositions = this.gameGrid.getCorrectPositions();
+    this.gameController.setCorrectPositions(correctPositions);
+
     this.gameController.startNewGame();
   }
 
-  private generateRandomizedStageWords(): void {
-    this.STAGE_WORDS = [];
-    this.CORRECT_POSITIONS = [];
+  private createGameGrid(): void {
+    const config: GameGridConfig = {
+      width: 400,
+      height: 500,
+      x: (this.screenWidth - 400) / 2,
+      y: (this.screenHeight - 500) / 2,
+    };
 
-    this.STAGE_BASE_DATA.forEach((stageData, stageIndex) => {
-      const { correctWord, typoWord, gridSize } = stageData;
+    const callbacks: GameGridCallbacks = {
+      onCellClick: this.onGridCellClick.bind(this),
+    };
 
-      // 모든 셀을 정답 단어로 채우기
-      const grid: string[][] = [];
-      for (let row = 0; row < gridSize; row++) {
-        const rowData: string[] = [];
-        for (let col = 0; col < gridSize; col++) {
-          rowData.push(correctWord);
-        }
-        grid.push(rowData);
-      }
+    this.gameGrid = new GameGrid(config, callbacks);
+    this.addChild(this.gameGrid);
+  }
 
-      // 랜덤 위치 선택하고 틀린 단어 배치
-      const randomRow = Math.floor(Math.random() * gridSize);
-      const randomCol = Math.floor(Math.random() * gridSize);
-      grid[randomRow][randomCol] = typoWord;
+  public onGridCellClick(row: number, col: number): void {
+    // 현재 게임 상태가 PLAYING이 아니면 클릭 무시
+    if (this.gameController.getGameState() !== PlayingState.PLAYING) {
+      console.log("🚫 게임이 진행 중이 아니므로 클릭 무시");
+      return;
+    }
 
-      // 결과 저장
-      this.STAGE_WORDS.push(grid);
-      this.CORRECT_POSITIONS.push({ row: randomRow, col: randomCol });
+    // 현재 단계와 정답 위치 확인
+    const currentStage = this.gameController.getCurrentStage();
+    const correctPositions = this.gameGrid.getCorrectPositions();
+    const correctPos = correctPositions[currentStage - 1];
 
-      console.log(
-        "🔄 PlayingScene에서 GameController로 정답 위치 전달:",
-        this.CORRECT_POSITIONS
-      );
-      this.gameController.setCorrectPositions(this.CORRECT_POSITIONS);
-    });
+    // 정답인지 즉시 판단
+    const isCorrect = row === correctPos.row && col === correctPos.col;
 
-    // GameController에 새로운 정답 위치 전달
-    this.gameController.setCorrectPositions(this.CORRECT_POSITIONS);
+    if (isCorrect) {
+      // 정답이면 즉시 lottie 애니메이션 재생
+      console.log("🎉 정답! lottie 애니메이션 재생");
+      this.playSuccessAnimation();
+    }
+
+    // GameController에게 클릭 이벤트 전달
+    this.gameController.handleCellClick(row, col);
   }
 
   // GameEventCallbacks 인터페이스 구현
@@ -119,22 +99,22 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
     switch (state) {
       case PlayingState.PLAYING:
         this.showGameUI();
-        this.clearAllCellSelections();
-        this.enableGridInteraction(); // 플레이 중일 때만 그리드 터치 가능
+        this.gameGrid.clearAllSelections();
+        this.gameGrid.enableInteraction();
         break;
 
       case PlayingState.SUCCESS:
-        this.disableGridInteraction(); // 성공 시 그리드 터치 비활성화
+        this.gameGrid.disableInteraction(); // 성공 시 그리드 터치 비활성화
         this.handleSuccessState(data);
         break;
 
       case PlayingState.TIMEOUT:
-        this.disableGridInteraction(); // 시간 초과 시 그리드 터치 비활성화
+        this.gameGrid.disableInteraction(); // 시간 초과 시 그리드 터치 비활성화
         this.handleTimeoutState(data);
         break;
 
       case PlayingState.WRONG:
-        this.disableGridInteraction(); // 오답 시 그리드 터치 비활성화
+        this.gameGrid.disableInteraction(); // 오답 시 그리드 터치 비활성화
         this.handleWrongState(data);
         break;
     }
@@ -200,22 +180,6 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
       document.body.removeChild(this.animationContainer);
       this.animationContainer = null;
     }
-  }
-
-  private enableGridInteraction(): void {
-    this.gridCells.forEach((cell) => {
-      cell.eventMode = "static";
-      cell.cursor = "pointer";
-    });
-    console.log("✅ 그리드 터치 활성화");
-  }
-
-  private disableGridInteraction(): void {
-    this.gridCells.forEach((cell) => {
-      cell.eventMode = "none";
-      cell.cursor = "default";
-    });
-    console.log("❌ 그리드 터치 비활성화");
   }
 
   private playSuccessAnimation(): void {
@@ -323,7 +287,7 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
 
     // 선택한 셀을 빨간색으로, 정답 셀을 검은색으로 표시
     if (data.selectedPosition && data.correctPosition) {
-      this.highlightWrongAndCorrectCells(
+      this.gameGrid.highlightWrongAndCorrectCells(
         data.selectedPosition,
         data.correctPosition
       );
@@ -343,59 +307,6 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
 
     // 하단에 버튼만 표시
     this.showStateUI("", data.buttonText, data.buttonColor);
-  }
-
-  private highlightWrongAndCorrectCells(
-    selectedPos: { row: number; col: number },
-    correctPos: { row: number; col: number }
-  ): void {
-    this.gridCells.forEach((cell) => {
-      const position = (cell as any).gridPosition;
-
-      if (
-        position.row === selectedPos.row &&
-        position.col === selectedPos.col
-      ) {
-        // 선택한 셀 (틀린 답) - 연분홍색
-        this.applyCellWrongStyle(cell);
-      } else if (
-        position.row === correctPos.row &&
-        position.col === correctPos.col
-      ) {
-        // 정답 셀 - 검은색
-        this.applyCellCorrectStyle(cell);
-      } else {
-        // 나머지 셀들은 기본 스타일로
-        this.resetCellStyle(cell);
-      }
-    });
-
-    // 선택된 셀 정보 초기화
-    this.selectedCell = null;
-  }
-
-  private applyCellWrongStyle(cell: Container): void {
-    const bg = (cell as any).background as Graphics;
-    const dimensions = (cell as any).cellDimensions;
-
-    if (bg && dimensions) {
-      bg.clear();
-      bg.roundRect(0, 0, dimensions.width, dimensions.height, 20);
-      bg.fill(0xffffff);
-      bg.stroke({ width: 3, color: 0xf69f9f }); // 연분홍색
-    }
-  }
-
-  private applyCellCorrectStyle(cell: Container): void {
-    const bg = (cell as any).background as Graphics;
-    const dimensions = (cell as any).cellDimensions;
-
-    if (bg && dimensions) {
-      bg.clear();
-      bg.roundRect(0, 0, dimensions.width, dimensions.height, 20);
-      bg.fill(0xffffff);
-      bg.stroke({ width: 3, color: 0x000000 }); // 검은색
-    }
   }
 
   private showGameUI(): void {
@@ -448,7 +359,7 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
 
   public onStageChange(stage: number): void {
     console.log(`🎯 Stage changed to: ${stage}`);
-    this.createGridForStage(stage);
+    this.gameGrid.createForStage(stage);
   }
 
   private createSuccessMessage(): void {
@@ -551,167 +462,6 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
     this.addChild(this.progressBar);
   }
 
-  private createGrid(): void {
-    this.gridContainer = new Container();
-    this.addChild(this.gridContainer);
-
-    this.gridContainer.x = (this.screenWidth - 400) / 2;
-    this.gridContainer.y = (this.screenHeight - 500) / 2;
-  }
-
-  private createGridForStage(stage: number): void {
-    this.clearGrid();
-
-    const gridSize = GAME_CONFIG.GRID_SIZES[stage - 1];
-    const gap = this.STAGE_GAPS[stage - 1];
-
-    const cellWidth = (400 - gap * (gridSize - 1)) / gridSize;
-    const cellHeight = (500 - gap * (gridSize - 1)) / gridSize;
-
-    for (let row = 0; row < gridSize; row++) {
-      for (let col = 0; col < gridSize; col++) {
-        const x = col * (cellWidth + gap);
-        const y = row * (cellHeight + gap);
-        const word = this.STAGE_WORDS[stage - 1][row][col];
-
-        const cell = this.createGridCell(
-          x,
-          y,
-          cellWidth,
-          cellHeight,
-          row,
-          col,
-          word,
-          stage
-        );
-        this.gridContainer.addChild(cell);
-        this.gridCells.push(cell);
-      }
-    }
-  }
-
-  private createGridCell(
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    row: number,
-    col: number,
-    word: string,
-    stage: number
-  ): Container {
-    const bg = new Graphics();
-    bg.roundRect(0, 0, width, height, 20);
-    bg.fill(0xffffff);
-    bg.stroke({ width: 1, color: 0xe9e9e9 });
-
-    const fontSize = this.STAGE_FONT_SIZES[stage - 1];
-
-    const text = new Text({
-      text: word,
-      style: {
-        fontFamily: "Pretendard",
-        fontSize: fontSize,
-        fill: 0x000000,
-        align: "center",
-        fontWeight: "700",
-      },
-    });
-    text.anchor.set(0.5);
-    text.x = width / 2;
-    text.y = height / 2;
-
-    const container = new Container();
-    container.addChild(bg, text);
-    container.x = x;
-    container.y = y;
-
-    container.eventMode = "static";
-    container.cursor = "pointer";
-
-    container.on("pointerdown", () => {
-      this.onCellClick(row, col, container);
-    });
-
-    (container as any).gridPosition = { row, col };
-    (container as any).background = bg;
-    (container as any).cellDimensions = { width, height };
-
-    return container;
-  }
-
-  private onCellClick(
-    row: number,
-    col: number,
-    cellContainer: Container
-  ): void {
-    // 현재 게임 상태가 PLAYING이 아니면 클릭 무시
-    if (this.gameController.getGameState() !== PlayingState.PLAYING) {
-      console.log("🚫 게임이 진행 중이 아니므로 클릭 무시");
-      return;
-    }
-
-    console.log(`🎯 Cell clicked: (${row}, ${col})`);
-
-    this.updateCellSelection(cellContainer);
-
-    // 현재 단계 가져오기
-    const currentStage = this.gameController.getCurrentStage();
-    const correctPos = this.CORRECT_POSITIONS[currentStage - 1];
-
-    // 정답인지 즉시 판단
-    const isCorrect = row === correctPos.row && col === correctPos.col;
-
-    if (isCorrect) {
-      // 정답이면 즉시 lottie 애니메이션 재생
-      console.log("🎉 정답! lottie 애니메이션 재생");
-      this.playSuccessAnimation();
-    }
-
-    // GameManager에게 클릭 이벤트 전달
-    this.gameController.handleCellClick(row, col);
-  }
-
-  private updateCellSelection(newSelectedCell: Container): void {
-    if (this.selectedCell) {
-      this.resetCellStyle(this.selectedCell);
-    }
-
-    this.applyCellSelectedStyle(newSelectedCell);
-    this.selectedCell = newSelectedCell;
-  }
-
-  private resetCellStyle(cell: Container): void {
-    const bg = (cell as any).background as Graphics;
-    const dimensions = (cell as any).cellDimensions;
-
-    if (bg && dimensions) {
-      bg.clear();
-      bg.roundRect(0, 0, dimensions.width, dimensions.height, 20);
-      bg.fill(0xffffff);
-      bg.stroke({ width: 1, color: 0xe9e9e9 });
-    }
-  }
-
-  private applyCellSelectedStyle(cell: Container): void {
-    const bg = (cell as any).background as Graphics;
-    const dimensions = (cell as any).cellDimensions;
-
-    if (bg && dimensions) {
-      bg.clear();
-      bg.roundRect(0, 0, dimensions.width, dimensions.height, 20);
-      bg.fill(0xffffff);
-      bg.stroke({ width: 3, color: 0x000000 });
-    }
-  }
-
-  private clearAllCellSelections(): void {
-    this.gridCells.forEach((cell) => {
-      this.resetCellStyle(cell);
-    });
-    this.selectedCell = null;
-  }
-
   private showStateUI(
     message: string,
     buttonText: string,
@@ -737,14 +487,6 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
     this.stateUIContainer.visible = true;
   }
 
-  private clearGrid(): void {
-    this.gridCells.forEach((cell) => {
-      this.gridContainer.removeChild(cell);
-      cell.destroy();
-    });
-    this.gridCells = [];
-  }
-
   public reset(): void {
     super.reset();
 
@@ -758,17 +500,18 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
     // GameController 정리
     this.gameController.cleanup();
 
-    this.generateRandomizedStageWords();
+    // GameGrid 리셋
+    this.gameGrid.reset();
+
+    // GameGrid에서 새로 생성된 정답 위치를 GameController에 전달
+    const correctPositions = this.gameGrid.getCorrectPositions();
+    this.gameController.setCorrectPositions(correctPositions);
 
     // UI 상태 초기화
     this.progressBar.show();
     this.progressBar.reset();
     this.successMessageText.visible = false;
     this.stateUIContainer.visible = false;
-
-    // 그리드 정리
-    this.clearGrid();
-    this.clearAllCellSelections();
 
     // GameController 재초기화 및 새 게임 시작
     this.gameController.initialize(this);
