@@ -17,12 +17,12 @@ export class GameController {
 
   private callbacks: GameEventCallbacks | null = null;
 
-  private readonly CORRECT_POSITIONS = [
-    { row: 0, col: 1 }, // 1단계: "재쵹"
-    { row: 2, col: 2 }, // 2단계: "휸민정음"
-    { row: 0, col: 2 }, // 3단계: "새종대왕"
-    { row: 4, col: 3 }, // 4단계: "댸한\n민국\n만세"
-    { row: 4, col: 3 }, // 5단계: "걔미\n허리\n왕잠\n자리"
+  private CORRECT_POSITIONS: { row: number; col: number }[] = [
+    { row: 0, col: 1 }, // 기본값 (사용되지 않음)
+    { row: 2, col: 2 },
+    { row: 0, col: 2 },
+    { row: 4, col: 3 },
+    { row: 4, col: 3 },
   ];
 
   public static getInstance(): GameController {
@@ -36,6 +36,16 @@ export class GameController {
     this.callbacks = callbacks;
     this.currentStage = 1;
     this.gameState = PlayingState.PLAYING;
+  }
+
+  public setCorrectPositions(positions: { row: number; col: number }[]): void {
+    // 배열 내용을 완전히 교체
+    this.CORRECT_POSITIONS.length = 0; // 기존 배열 비우기
+    this.CORRECT_POSITIONS.push(...positions); // 새로운 내용 추가
+    console.log(
+      "🎯 GameController 정답 위치 업데이트:",
+      this.CORRECT_POSITIONS
+    );
   }
 
   public startNewGame(): void {
@@ -60,6 +70,14 @@ export class GameController {
 
     const correctPos = this.CORRECT_POSITIONS[this.currentStage - 1];
     const isCorrect = row === correctPos.row && col === correctPos.col;
+
+    // 디버깅 로그 추가
+    console.log(`🎯 GameController 클릭 검증:`);
+    console.log(`   클릭한 위치: (${row}, ${col})`);
+    console.log(`   현재 단계: ${this.currentStage}`);
+    console.log(`   정답 위치: (${correctPos.row}, ${correctPos.col})`);
+    console.log(`   전체 정답 배열:`, this.CORRECT_POSITIONS);
+    console.log(`   정답 여부: ${isCorrect}`);
 
     if (isCorrect) {
       this.gameState = PlayingState.SUCCESS;

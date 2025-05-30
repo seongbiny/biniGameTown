@@ -36,105 +36,24 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
     18, // 5단계: 5x5 - 더 작은 폰트
   ];
 
-  private readonly STAGE_WORDS: string[][][] = [
-    [
-      ["재촉", "재쵹"],
-      ["재촉", "재촉"],
-    ],
-    [
-      ["훈민정음", "훈민정음", "훈민정음"],
-      ["훈민정음", "훈민정음", "훈민정음"],
-      ["훈민정음", "훈민정음", "휸민정음"],
-    ],
-    [
-      ["세종대왕", "세종대왕", "새종대왕", "세종대왕"],
-      ["세종대왕", "세종대왕", "세종대왕", "세종대왕"],
-      ["세종대왕", "세종대왕", "세종대왕", "세종대왕"],
-      ["세종대왕", "세종대왕", "세종대왕", "세종대왕"],
-    ],
-    [
-      [
-        "대한\n민국\n만세",
-        "대한\n민국\n만세",
-        "대한\n민국\n만세",
-        "대한\n민국\n만세",
-        "대한\n민국\n만세",
-      ],
-      [
-        "대한\n민국\n만세",
-        "대한\n민국\n만세",
-        "대한\n민국\n만세",
-        "대한\n민국\n만세",
-        "대한\n민국\n만세",
-      ],
-      [
-        "대한\n민국\n만세",
-        "대한\n민국\n만세",
-        "대한\n민국\n만세",
-        "대한\n민국\n만세",
-        "대한\n민국\n만세",
-      ],
-      [
-        "대한\n민국\n만세",
-        "대한\n민국\n만세",
-        "대한\n민국\n만세",
-        "대한\n민국\n만세",
-        "대한\n민국\n만세",
-      ],
-      [
-        "대한\n민국\n만세",
-        "대한\n민국\n만세",
-        "대한\n민국\n만세",
-        "댸한\n민국\n만세",
-        "대한\n민국\n만세",
-      ],
-    ],
-    [
-      [
-        "개미\n허리\n왕잠\n자리",
-        "개미\n허리\n왕잠\n자리",
-        "개미\n허리\n왕잠\n자리",
-        "개미\n허리\n왕잠\n자리",
-        "개미\n허리\n왕잠\n자리",
-      ],
-      [
-        "개미\n허리\n왕잠\n자리",
-        "개미\n허리\n왕잠\n자리",
-        "개미\n허리\n왕잠\n자리",
-        "개미\n허리\n왕잠\n자리",
-        "개미\n허리\n왕잠\n자리",
-      ],
-      [
-        "개미\n허리\n왕잠\n자리",
-        "개미\n허리\n왕잠\n자리",
-        "개미\n허리\n왕잠\n자리",
-        "개미\n허리\n왕잠\n자리",
-        "개미\n허리\n왕잠\n자리",
-      ],
-      [
-        "개미\n허리\n왕잠\n자리",
-        "개미\n허리\n왕잠\n자리",
-        "개미\n허리\n왕잠\n자리",
-        "개미\n허리\n왕잠\n자리",
-        "개미\n허리\n왕잠\n자리",
-      ],
-      [
-        "개미\n허리\n왕잠\n자리",
-        "개미\n허리\n왕잠\n자리",
-        "개미\n허리\n왕잠\n자리",
-        "걔미\n허리\n왕잠\n자리",
-        "개미\n허리\n왕잠\n자리",
-      ],
-    ],
+  private readonly STAGE_BASE_DATA = [
+    { correctWord: "재촉", typoWord: "재쵹", gridSize: 2 },
+    { correctWord: "훈민정음", typoWord: "휸민정음", gridSize: 3 },
+    { correctWord: "세종대왕", typoWord: "새종대왕", gridSize: 4 },
+    {
+      correctWord: "대한\n민국\n만세",
+      typoWord: "댸한\n민국\n만세",
+      gridSize: 5,
+    },
+    {
+      correctWord: "개미\n허리\n왕잠\n자리",
+      typoWord: "걔미\n허리\n왕잠\n자리",
+      gridSize: 5,
+    },
   ];
 
-  private readonly CORRECT_POSITIONS = [
-    { row: 0, col: 1 }, // 1단계: "재쵹"
-    { row: 2, col: 2 }, // 2단계: "휸민정음"
-    { row: 0, col: 2 }, // 3단계: "새종대왕"
-    { row: 4, col: 3 }, // 4단계: "댸한\n민국\n만세"
-    { row: 4, col: 3 }, // 5단계: "걔미\n허리\n왕잠\n자리"
-  ];
+  private STAGE_WORDS: string[][][] = [];
+  private CORRECT_POSITIONS: { row: number; col: number }[] = [];
 
   constructor(parent: Container) {
     super(parent);
@@ -144,6 +63,8 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
   public initialize(): void {
     super.initialize();
 
+    this.generateRandomizedStageWords();
+
     this.createProgressBar();
     this.createSuccessMessage();
     this.createStateUI();
@@ -152,6 +73,43 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
     // GameManager 초기화 및 콜백 설정
     this.gameController.initialize(this);
     this.gameController.startNewGame();
+  }
+
+  private generateRandomizedStageWords(): void {
+    this.STAGE_WORDS = [];
+    this.CORRECT_POSITIONS = [];
+
+    this.STAGE_BASE_DATA.forEach((stageData, stageIndex) => {
+      const { correctWord, typoWord, gridSize } = stageData;
+
+      // 모든 셀을 정답 단어로 채우기
+      const grid: string[][] = [];
+      for (let row = 0; row < gridSize; row++) {
+        const rowData: string[] = [];
+        for (let col = 0; col < gridSize; col++) {
+          rowData.push(correctWord);
+        }
+        grid.push(rowData);
+      }
+
+      // 랜덤 위치 선택하고 틀린 단어 배치
+      const randomRow = Math.floor(Math.random() * gridSize);
+      const randomCol = Math.floor(Math.random() * gridSize);
+      grid[randomRow][randomCol] = typoWord;
+
+      // 결과 저장
+      this.STAGE_WORDS.push(grid);
+      this.CORRECT_POSITIONS.push({ row: randomRow, col: randomCol });
+
+      console.log(
+        "🔄 PlayingScene에서 GameController로 정답 위치 전달:",
+        this.CORRECT_POSITIONS
+      );
+      this.gameController.setCorrectPositions(this.CORRECT_POSITIONS);
+    });
+
+    // GameController에 새로운 정답 위치 전달
+    this.gameController.setCorrectPositions(this.CORRECT_POSITIONS);
   }
 
   // GameEventCallbacks 인터페이스 구현
@@ -814,6 +772,8 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
 
     // GameController 정리
     this.gameController.cleanup();
+
+    this.generateRandomizedStageWords();
 
     // UI 상태 초기화
     this.progressBarContainer.visible = true;
