@@ -6,10 +6,10 @@ import { GameController } from "../../core/GameController";
 import type { GameEventCallbacks } from "../../core/GameController";
 import { getAnimationData } from "../../../assets/assetsPreload";
 import lottie from "lottie-web";
+import { ProgressBar } from "../ui/ProgressBar";
+import type { ProgressBarConfig } from "../ui/ProgressBar";
 export class PlayingScene extends Scene implements GameEventCallbacks {
-  private progressBarContainer!: Container;
-  private progressBarBg!: Graphics;
-  private progressBarFill!: Graphics;
+  private progressBar!: ProgressBar;
 
   private gridContainer!: Container;
   private gridCells: Container[] = [];
@@ -144,7 +144,7 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
     if (!data) return;
 
     // 프로그레스바 숨기고 상단에 시간 초과 메시지 표시
-    this.progressBarContainer.visible = false;
+    this.progressBar.hide();
     this.successMessageText.text = data.topMessage;
     this.successMessageText.style.fill = 0x000000;
     this.successMessageText.style.fontSize = 24;
@@ -330,7 +330,7 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
     }
 
     // 프로그레스바 숨기고 상단에 오답 메시지 표시
-    this.progressBarContainer.visible = false;
+    this.progressBar.hide();
     this.successMessageText.text = data.topMessage;
     this.successMessageText.style.fill = 0x000000;
     this.successMessageText.style.fontSize = 24;
@@ -399,13 +399,13 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
   }
 
   private showGameUI(): void {
-    this.progressBarContainer.visible = true;
+    this.progressBar.visible = true;
     this.successMessageText.visible = false;
     this.stateUIContainer.visible = false;
   }
 
   private showSuccessMessage(message: string): void {
-    this.progressBarContainer.visible = false;
+    this.progressBar.visible = false;
     this.successMessageText.text = message;
     this.successMessageText.style.fill = 0x000000;
     this.successMessageText.style.fontSize = 24;
@@ -424,7 +424,7 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
     buttonText: string,
     buttonColor: number
   ): void {
-    this.progressBarContainer.visible = false;
+    this.progressBar.hide();
 
     // 상단 메시지 설정
     this.successMessageText.text = topMessage;
@@ -443,7 +443,7 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
   }
 
   public onTimerUpdate(timeLeft: number, progress: number): void {
-    this.updateProgressBar(progress);
+    this.progressBar.updateProgress(progress);
   }
 
   public onStageChange(stage: number): void {
@@ -535,23 +535,20 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
   }
 
   private createProgressBar(): void {
-    this.progressBarContainer = new Container();
-    this.addChild(this.progressBarContainer);
+    const width = Math.min(410, this.screenWidth * 0.9);
 
-    this.progressBarContainer.x = (this.screenWidth - 410) / 2;
-    this.progressBarContainer.y = 34;
+    const config: ProgressBarConfig = {
+      width: width,
+      height: 10,
+      x: (this.screenWidth - width) / 2,
+      y: 34,
+      backgroundColor: 0xd9d9d9,
+      fillColor: 0x000000,
+      borderRadius: 5, // 모서리 둥글게
+    };
 
-    this.progressBarBg = new Graphics();
-    this.progressBarBg.rect(0, 0, 410, 10);
-    this.progressBarBg.fill(0xd9d9d9);
-
-    this.progressBarFill = new Graphics();
-    this.progressBarContainer.addChild(
-      this.progressBarBg,
-      this.progressBarFill
-    );
-
-    this.updateProgressBar(1.0);
+    this.progressBar = new ProgressBar(config);
+    this.addChild(this.progressBar);
   }
 
   private createGrid(): void {
@@ -748,17 +745,6 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
     this.gridCells = [];
   }
 
-  private updateProgressBar(progress: number = 1.0): void {
-    this.progressBarFill.clear();
-
-    const fillWidth = 410 * Math.max(0, Math.min(1, progress)); // progress를 0-1로 제한
-
-    if (fillWidth > 0) {
-      this.progressBarFill.rect(0, 0, fillWidth, 10);
-      this.progressBarFill.fill(0x000000);
-    }
-  }
-
   public reset(): void {
     super.reset();
 
@@ -775,7 +761,8 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
     this.generateRandomizedStageWords();
 
     // UI 상태 초기화
-    this.progressBarContainer.visible = true;
+    this.progressBar.show();
+    this.progressBar.reset();
     this.successMessageText.visible = false;
     this.stateUIContainer.visible = false;
 
