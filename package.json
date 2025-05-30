@@ -13,12 +13,13 @@
   ],
   "scripts": {
     "dev": "yarn workspace @bini-game-town/web dev",
-    "prebuild": "mkdir -p dist/game/bini-puzzle dist/game/flappy-plane",
-    "build": "yarn workspace @bini-game-town/web build && yarn workspace @bini-game-town/bini-puzzle build && yarn workspace @bini-game-town/flappy-plane build",
-    "build:games": "yarn workspace @bini-game-town/bini-puzzle build && yarn workspace @bini-game-town/flappy-plane build",
+    "prebuild": "mkdir -p dist/game/bini-puzzle dist/game/flappy-plane dist/game/typo-trap",
+    "build": "yarn workspace @bini-game-town/web build && yarn workspace @bini-game-town/bini-puzzle build && yarn workspace @bini-game-town/flappy-plane build && yarn workspace @bini-game-town/typo-trap build",
+    "build:games": "yarn workspace @bini-game-town/bini-puzzle build && yarn workspace @bini-game-town/flappy-plane build && yarn workspace @bini-game-town/typo-trap build",
     "build:web": "yarn workspace @bini-game-town/web build",
     "build:puzzle": "yarn workspace @bini-game-town/bini-puzzle build",
     "build:flappy": "yarn workspace @bini-game-town/flappy-plane build",
+    "build:typo": "yarn workspace @bini-game-town/typo-trap build",
     "preview": "yarn workspace @bini-game-town/web preview",
     "lint": "yarn workspaces foreach -p run lint"
   },
