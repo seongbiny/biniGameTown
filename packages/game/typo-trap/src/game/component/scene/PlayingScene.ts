@@ -14,16 +14,15 @@ import type {
   GameGridCallbacks,
   Position,
 } from "../ui/GameGrid";
+import { StateMessage } from "../ui/StateMessage";
+import type {
+  StateMessageConfig,
+  StateMessageCallbacks,
+} from "../ui/StateMessage";
 export class PlayingScene extends Scene implements GameEventCallbacks {
   private progressBar!: ProgressBar;
   private gameGrid!: GameGrid;
-
-  private stateUIContainer!: Container;
-  private messageText!: Text;
-  private actionButton!: Graphics;
-  private buttonText!: Text;
-
-  private successMessageText!: Text;
+  private stateMessage!: StateMessage;
 
   private gameController: GameController;
 
@@ -39,8 +38,7 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
 
     this.createProgressBar();
     this.createGameGrid();
-    this.createSuccessMessage();
-    this.createStateUI();
+    this.createStateMessage();
 
     // GameManager 초기화 및 콜백 설정
     this.gameController.initialize(this);
@@ -49,6 +47,70 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
     this.gameController.setCorrectPositions(correctPositions);
 
     this.gameController.startNewGame();
+  }
+
+  public onStateChange(state: PlayingState, data?: any): void {
+    console.log(`🎮 Game state changed to: ${state}`);
+
+    switch (state) {
+      case PlayingState.PLAYING:
+        this.showGameUI();
+        this.gameGrid.clearAllSelections();
+        this.gameGrid.enableInteraction();
+        break;
+
+      case PlayingState.SUCCESS:
+        this.gameGrid.disableInteraction();
+        this.handleSuccessState(data);
+        break;
+
+      case PlayingState.TIMEOUT:
+        this.gameGrid.disableInteraction();
+        this.handleTimeoutState(data);
+        break;
+
+      case PlayingState.WRONG:
+        this.gameGrid.disableInteraction();
+        this.handleWrongState(data);
+        break;
+    }
+  }
+
+  private createStateMessage(): void {
+    const config: StateMessageConfig = {
+      screenWidth: this.screenWidth,
+      screenHeight: this.screenHeight,
+      gridTopY: (this.screenHeight - 500) / 2,
+    };
+
+    const callbacks: StateMessageCallbacks = {
+      onButtonClick: this.onStateMessageButtonClick.bind(this),
+    };
+
+    this.stateMessage = new StateMessage(config, callbacks);
+    this.addChild(this.stateMessage);
+  }
+
+  public onStateMessageButtonClick(action: string): void {
+    console.log(`🔘 StateMessage action received: ${action}`);
+
+    switch (action) {
+      case "next_stage":
+        this.removeSuccessAnimation();
+        const hasNextStage = this.gameController.proceedToNextStage();
+        if (!hasNextStage) {
+          SceneController.getInstance().switchScene("RESULT");
+        }
+        break;
+
+      case "retry":
+        SceneController.getInstance().switchScene("READY");
+        break;
+
+      default:
+        console.warn(`⚠️ Unknown StateMessage action: ${action}`);
+        break;
+    }
   }
 
   private createGameGrid(): void {
@@ -92,51 +154,11 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
     this.gameController.handleCellClick(row, col);
   }
 
-  // GameEventCallbacks 인터페이스 구현
-  public onStateChange(state: PlayingState, data?: any): void {
-    console.log(`🎮 Game state changed to: ${state}`);
-
-    switch (state) {
-      case PlayingState.PLAYING:
-        this.showGameUI();
-        this.gameGrid.clearAllSelections();
-        this.gameGrid.enableInteraction();
-        break;
-
-      case PlayingState.SUCCESS:
-        this.gameGrid.disableInteraction(); // 성공 시 그리드 터치 비활성화
-        this.handleSuccessState(data);
-        break;
-
-      case PlayingState.TIMEOUT:
-        this.gameGrid.disableInteraction(); // 시간 초과 시 그리드 터치 비활성화
-        this.handleTimeoutState(data);
-        break;
-
-      case PlayingState.WRONG:
-        this.gameGrid.disableInteraction(); // 오답 시 그리드 터치 비활성화
-        this.handleWrongState(data);
-        break;
-    }
-  }
-
   private handleTimeoutState(data: any): void {
     if (!data) return;
 
-    // 프로그레스바 숨기고 상단에 시간 초과 메시지 표시
     this.progressBar.hide();
-    this.successMessageText.text = data.topMessage;
-    this.successMessageText.style.fill = 0x000000;
-    this.successMessageText.style.fontSize = 24;
-
-    const gridTopY = (this.screenHeight - 500) / 2;
-    const messageY = gridTopY / 2;
-    this.successMessageText.y = messageY;
-
-    this.successMessageText.visible = true;
-
-    // 하단에 버튼만 표시
-    this.showStateUI("", data.buttonText, data.buttonColor);
+    this.stateMessage.showTimeoutMessage(data.topMessage, data.buttonText);
   }
 
   private handleSuccessState(data: any): void {
@@ -144,16 +166,14 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
 
     switch (data.stage) {
       case "success_message":
-        // 1단계: "N단계 성공!" 메시지만 상단에 표시
-        this.showSuccessMessage(data.message);
+        this.stateMessage.showSuccessMessage(data.message);
         break;
 
       case "next_stage_confirm":
-        // 2단계: 상단 메시지 변경 + 하단 버튼 표시
-        this.showNextStageUI(
+        this.stateMessage.showNextStageMessage(
           data.topMessage,
           data.buttonText,
-          data.buttonColor
+          "next_stage"
         );
         break;
 
@@ -164,11 +184,10 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
         break;
 
       case "all_complete":
-        // 모든 단계 완료
-        this.showNextStageUI(
+        this.stateMessage.showNextStageMessage(
           data.topMessage,
           data.buttonText,
-          data.buttonColor
+          "next_stage"
         );
         break;
     }
@@ -285,7 +304,6 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
   private handleWrongState(data: any): void {
     if (!data) return;
 
-    // 선택한 셀을 빨간색으로, 정답 셀을 검은색으로 표시
     if (data.selectedPosition && data.correctPosition) {
       this.gameGrid.highlightWrongAndCorrectCells(
         data.selectedPosition,
@@ -293,64 +311,13 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
       );
     }
 
-    // 프로그레스바 숨기고 상단에 오답 메시지 표시
     this.progressBar.hide();
-    this.successMessageText.text = data.topMessage;
-    this.successMessageText.style.fill = 0x000000;
-    this.successMessageText.style.fontSize = 24;
-
-    const gridTopY = (this.screenHeight - 500) / 2;
-    const messageY = gridTopY / 2;
-    this.successMessageText.y = messageY;
-
-    this.successMessageText.visible = true;
-
-    // 하단에 버튼만 표시
-    this.showStateUI("", data.buttonText, data.buttonColor);
+    this.stateMessage.showWrongMessage(data.topMessage, data.buttonText);
   }
 
   private showGameUI(): void {
     this.progressBar.visible = true;
-    this.successMessageText.visible = false;
-    this.stateUIContainer.visible = false;
-  }
-
-  private showSuccessMessage(message: string): void {
-    this.progressBar.visible = false;
-    this.successMessageText.text = message;
-    this.successMessageText.style.fill = 0x000000;
-    this.successMessageText.style.fontSize = 24;
-
-    // 그리드와 화면 상단 사이의 가운데 위치
-    const gridTopY = (this.screenHeight - 500) / 2;
-    const messageY = gridTopY / 2;
-    this.successMessageText.y = messageY;
-
-    this.successMessageText.visible = true;
-    this.stateUIContainer.visible = false;
-  }
-
-  private showNextStageUI(
-    topMessage: string,
-    buttonText: string,
-    buttonColor: number
-  ): void {
-    this.progressBar.hide();
-
-    // 상단 메시지 설정
-    this.successMessageText.text = topMessage;
-    this.successMessageText.style.fill = 0x000000;
-    this.successMessageText.style.fontSize = 24;
-
-    // 그리드와 화면 상단 사이의 가운데 위치
-    const gridTopY = (this.screenHeight - 500) / 2;
-    const messageY = gridTopY / 2;
-    this.successMessageText.y = messageY;
-
-    this.successMessageText.visible = true;
-
-    // 하단에 버튼만 표시 (메시지는 비우기)
-    this.showStateUI("", buttonText, buttonColor);
+    this.stateMessage.hide();
   }
 
   public onTimerUpdate(timeLeft: number, progress: number): void {
@@ -360,89 +327,6 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
   public onStageChange(stage: number): void {
     console.log(`🎯 Stage changed to: ${stage}`);
     this.gameGrid.createForStage(stage);
-  }
-
-  private createSuccessMessage(): void {
-    this.successMessageText = new Text({
-      text: "",
-      style: {
-        fontFamily: "Pretendard",
-        fontSize: 24,
-        fill: 0x000000,
-        align: "center",
-        fontWeight: "600",
-      },
-    });
-    this.successMessageText.anchor.set(0.5);
-    this.successMessageText.x = this.screenWidth / 2;
-    this.successMessageText.y = 34 + 5; // 프로그레스바와 같은 위치
-    this.successMessageText.visible = false;
-    this.addChild(this.successMessageText);
-  }
-
-  private createStateUI(): void {
-    this.stateUIContainer = new Container();
-    this.addChild(this.stateUIContainer);
-
-    this.messageText = new Text({
-      text: "",
-      style: {
-        fontFamily: "Pretendard",
-        fontSize: 24,
-        fill: 0x000000,
-        align: "center",
-        fontWeight: "600",
-      },
-    });
-    this.messageText.anchor.set(0.5);
-    this.messageText.x = this.screenWidth / 2;
-    this.messageText.y = this.screenHeight - 120;
-    this.stateUIContainer.addChild(this.messageText);
-
-    this.actionButton = new Graphics();
-    this.actionButton.x = this.screenWidth / 2;
-    this.actionButton.y = this.screenHeight - 60;
-    this.actionButton.eventMode = "static";
-    this.actionButton.cursor = "pointer";
-    this.actionButton.on("pointerdown", this.onButtonClick.bind(this));
-    this.stateUIContainer.addChild(this.actionButton);
-
-    this.buttonText = new Text({
-      text: "",
-      style: {
-        fontFamily: "Pretendard",
-        fontSize: 20,
-        fill: 0xffffff,
-        align: "center",
-        fontWeight: "600",
-      },
-    });
-
-    this.buttonText.anchor.set(0.5);
-    this.actionButton.addChild(this.buttonText);
-
-    this.stateUIContainer.visible = false;
-  }
-
-  private onButtonClick(): void {
-    const currentState = this.gameController.getGameState();
-    console.log(`🔘 Button clicked in state: ${currentState}`);
-
-    switch (currentState) {
-      case PlayingState.SUCCESS:
-        this.removeSuccessAnimation();
-
-        const hasNextStage = this.gameController.proceedToNextStage();
-        if (!hasNextStage) {
-          SceneController.getInstance().switchScene("RESULT");
-        }
-        break;
-
-      case PlayingState.WRONG:
-      case PlayingState.TIMEOUT:
-        SceneController.getInstance().switchScene("READY");
-        break;
-    }
   }
 
   private createProgressBar(): void {
@@ -462,31 +346,6 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
     this.addChild(this.progressBar);
   }
 
-  private showStateUI(
-    message: string,
-    buttonText: string,
-    buttonColor: number
-  ): void {
-    // 메시지가 비어있으면 텍스트 숨기기
-    if (message.trim() === "") {
-      this.messageText.visible = false;
-    } else {
-      this.messageText.text = message;
-      this.messageText.visible = true;
-    }
-
-    this.actionButton.clear();
-    this.actionButton.roundRect(-205, -25, 410, 50, 10);
-    this.actionButton.fill(0x353739);
-    this.actionButton.stroke({ width: 2, color: 0x353739 });
-
-    this.buttonText.text = buttonText;
-    this.buttonText.style.fill = 0xffffff;
-    this.buttonText.style.fontSize = 20;
-
-    this.stateUIContainer.visible = true;
-  }
-
   public reset(): void {
     super.reset();
 
@@ -503,6 +362,9 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
     // GameGrid 리셋
     this.gameGrid.reset();
 
+    // StateMessage 리셋
+    this.stateMessage.reset();
+
     // GameGrid에서 새로 생성된 정답 위치를 GameController에 전달
     const correctPositions = this.gameGrid.getCorrectPositions();
     this.gameController.setCorrectPositions(correctPositions);
@@ -510,8 +372,6 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
     // UI 상태 초기화
     this.progressBar.show();
     this.progressBar.reset();
-    this.successMessageText.visible = false;
-    this.stateUIContainer.visible = false;
 
     // GameController 재초기화 및 새 게임 시작
     this.gameController.initialize(this);
@@ -519,7 +379,6 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
 
     console.log("🔄 PlayingScene reset complete");
   }
-
   public pause(): void {
     super.pause();
 
