@@ -1,4 +1,4 @@
-import { Container, Graphics, Text } from "pixi.js";
+import { Container } from "pixi.js";
 import { Scene } from "./Scene";
 import { PlayingState } from "../../types";
 import SceneController from "../../core/SceneController";
@@ -15,14 +15,17 @@ import type {
   Position,
 } from "../ui/GameGrid";
 import { StateMessage } from "../ui/StateMessage";
-import type {
-  StateMessageConfig,
-  StateMessageCallbacks,
-} from "../ui/StateMessage";
-export class PlayingScene extends Scene implements GameEventCallbacks {
+import type { StateMessageConfig } from "../ui/StateMessage";
+import { ActionButton, ButtonStyle } from "../ui/ActionButton";
+import type { ActionButtonCallbacks } from "../ui/ActionButton";
+export class PlayingScene
+  extends Scene
+  implements GameEventCallbacks, ActionButtonCallbacks
+{
   private progressBar!: ProgressBar;
   private gameGrid!: GameGrid;
   private stateMessage!: StateMessage;
+  private actionButton!: ActionButton;
 
   private gameController: GameController;
 
@@ -39,6 +42,7 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
     this.createProgressBar();
     this.createGameGrid();
     this.createStateMessage();
+    this.createActionButton();
 
     // GameManager 초기화 및 콜백 설정
     this.gameController.initialize(this);
@@ -47,6 +51,43 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
     this.gameController.setCorrectPositions(correctPositions);
 
     this.gameController.startNewGame();
+  }
+
+  private createActionButton(): void {
+    this.actionButton = new ActionButton(
+      {
+        text: "", // 초기에는 빈 텍스트
+        x: this.screenWidth / 2,
+        y: this.screenHeight - 60,
+      },
+      {
+        onClick: this.onClick.bind(this), // 콜백 연결
+      }
+    );
+    this.actionButton.hide(); // 초기에는 숨김
+    this.addChild(this.actionButton);
+  }
+
+  public onClick(action: string, button: ActionButton): void {
+    console.log(`🔘 PlayingScene ActionButton clicked: ${action}`);
+
+    switch (action) {
+      case "next_stage":
+        this.removeSuccessAnimation();
+        const hasNextStage = this.gameController.proceedToNextStage();
+        if (!hasNextStage) {
+          SceneController.getInstance().switchScene("RESULT");
+        }
+        break;
+
+      case "retry":
+        SceneController.getInstance().switchScene("READY");
+        break;
+
+      default:
+        console.warn(`⚠️ Unknown action: ${action}`);
+        break;
+    }
   }
 
   public onStateChange(state: PlayingState, data?: any): void {
@@ -83,11 +124,7 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
       gridTopY: (this.screenHeight - 500) / 2,
     };
 
-    const callbacks: StateMessageCallbacks = {
-      onButtonClick: this.onStateMessageButtonClick.bind(this),
-    };
-
-    this.stateMessage = new StateMessage(config, callbacks);
+    this.stateMessage = new StateMessage(config);
     this.addChild(this.stateMessage);
   }
 
@@ -158,7 +195,11 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
     if (!data) return;
 
     this.progressBar.hide();
-    this.stateMessage.showTimeoutMessage(data.topMessage, data.buttonText);
+    this.stateMessage.showTopMessage(data.topMessage);
+    this.actionButton.setText(data.buttonText);
+    this.actionButton.setAction("retry");
+    this.actionButton.setStyle(ButtonStyle.WARNING);
+    this.actionButton.show();
   }
 
   private handleSuccessState(data: any): void {
@@ -166,15 +207,20 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
 
     switch (data.stage) {
       case "success_message":
-        this.stateMessage.showSuccessMessage(data.message);
+        // 메시지만 표시, 버튼 숨김
+        this.progressBar.hide();
+        this.stateMessage.showTopMessage(data.message);
+        this.actionButton.hide();
         break;
 
       case "next_stage_confirm":
-        this.stateMessage.showNextStageMessage(
-          data.topMessage,
-          data.buttonText,
-          "next_stage"
-        );
+        // 메시지 + 버튼 표시
+        this.progressBar.hide();
+        this.stateMessage.showTopMessage(data.topMessage);
+        this.actionButton.setText(data.buttonText);
+        this.actionButton.setAction("next_stage");
+        this.actionButton.setStyle(ButtonStyle.PRIMARY);
+        this.actionButton.show();
         break;
 
       case "final_complete":
@@ -184,11 +230,12 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
         break;
 
       case "all_complete":
-        this.stateMessage.showNextStageMessage(
-          data.topMessage,
-          data.buttonText,
-          "next_stage"
-        );
+        this.progressBar.hide();
+        this.stateMessage.showTopMessage(data.topMessage);
+        this.actionButton.setText(data.buttonText);
+        this.actionButton.setAction("next_stage");
+        this.actionButton.setStyle(ButtonStyle.PRIMARY);
+        this.actionButton.show();
         break;
     }
   }
@@ -312,12 +359,17 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
     }
 
     this.progressBar.hide();
-    this.stateMessage.showWrongMessage(data.topMessage, data.buttonText);
+    this.stateMessage.showTopMessage(data.topMessage);
+    this.actionButton.setText(data.buttonText);
+    this.actionButton.setAction("retry");
+    this.actionButton.setStyle(ButtonStyle.SECONDARY);
+    this.actionButton.show();
   }
 
   private showGameUI(): void {
     this.progressBar.visible = true;
     this.stateMessage.hide();
+    this.actionButton.hide(); // 게임 중에는 버튼 숨김
   }
 
   public onTimerUpdate(timeLeft: number, progress: number): void {
@@ -353,6 +405,8 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
       document.body.removeChild(this.animationContainer);
       this.animationContainer = null;
     }
+
+    this.actionButton.reset();
 
     this.removeSuccessAnimation();
 
