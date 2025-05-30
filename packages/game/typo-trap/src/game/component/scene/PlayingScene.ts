@@ -16,7 +16,7 @@ import type {
 } from "../ui/GameGrid";
 import { StateMessage } from "../ui/StateMessage";
 import type { StateMessageConfig } from "../ui/StateMessage";
-import { ActionButton, ButtonStyle } from "../ui/ActionButton";
+import { ActionButton } from "../ui/ActionButton";
 import type { ActionButtonCallbacks } from "../ui/ActionButton";
 export class PlayingScene
   extends Scene
@@ -198,7 +198,6 @@ export class PlayingScene
     this.stateMessage.showTopMessage(data.topMessage);
     this.actionButton.setText(data.buttonText);
     this.actionButton.setAction("retry");
-    this.actionButton.setStyle(ButtonStyle.WARNING);
     this.actionButton.show();
   }
 
@@ -207,19 +206,16 @@ export class PlayingScene
 
     switch (data.stage) {
       case "success_message":
-        // 메시지만 표시, 버튼 숨김
         this.progressBar.hide();
         this.stateMessage.showTopMessage(data.message);
         this.actionButton.hide();
         break;
 
       case "next_stage_confirm":
-        // 메시지 + 버튼 표시
         this.progressBar.hide();
         this.stateMessage.showTopMessage(data.topMessage);
         this.actionButton.setText(data.buttonText);
         this.actionButton.setAction("next_stage");
-        this.actionButton.setStyle(ButtonStyle.PRIMARY);
         this.actionButton.show();
         break;
 
@@ -234,7 +230,6 @@ export class PlayingScene
         this.stateMessage.showTopMessage(data.topMessage);
         this.actionButton.setText(data.buttonText);
         this.actionButton.setAction("next_stage");
-        this.actionButton.setStyle(ButtonStyle.PRIMARY);
         this.actionButton.show();
         break;
     }
@@ -362,7 +357,6 @@ export class PlayingScene
     this.stateMessage.showTopMessage(data.topMessage);
     this.actionButton.setText(data.buttonText);
     this.actionButton.setAction("retry");
-    this.actionButton.setStyle(ButtonStyle.SECONDARY);
     this.actionButton.show();
   }
 

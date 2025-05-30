@@ -3,31 +3,12 @@ import { Container, Graphics, Text } from "pixi.js";
 export interface ActionButtonConfig {
   x: number;
   y: number;
-  width?: number;
-  height?: number;
-  backgroundColor?: number;
-  borderColor?: number;
-  borderWidth?: number;
-  borderRadius?: number;
   text: string;
-  textColor?: number;
-  fontSize?: number;
-  fontWeight?: string;
 }
 
 export interface ActionButtonCallbacks {
   onClick: (action: string, button: ActionButton) => void;
 }
-
-export const ButtonStyle = {
-  PRIMARY: "primary",
-  SECONDARY: "secondary",
-  SUCCESS: "success",
-  WARNING: "warning",
-  DANGER: "danger",
-} as const;
-
-export type ButtonStyle = (typeof ButtonStyle)[keyof typeof ButtonStyle];
 
 export class ActionButton extends Container {
   private background!: Graphics;
@@ -37,55 +18,19 @@ export class ActionButton extends Container {
   private action: string = "";
   private isEnabled: boolean = true;
 
-  // 기본 스타일 정의
-  private readonly defaultStyles: Record<
-    ButtonStyle,
-    Partial<ActionButtonConfig>
-  > = {
-    [ButtonStyle.PRIMARY]: {
-      backgroundColor: 0x353739,
-      borderColor: 0x353739,
-      textColor: 0xffffff,
-    },
-    [ButtonStyle.SECONDARY]: {
-      backgroundColor: 0x666666,
-      borderColor: 0x666666,
-      textColor: 0xffffff,
-    },
-    [ButtonStyle.SUCCESS]: {
-      backgroundColor: 0x28a745,
-      borderColor: 0x28a745,
-      textColor: 0xffffff,
-    },
-    [ButtonStyle.WARNING]: {
-      backgroundColor: 0xff9800,
-      borderColor: 0xff9800,
-      textColor: 0xffffff,
-    },
-    [ButtonStyle.DANGER]: {
-      backgroundColor: 0xdc3545,
-      borderColor: 0xdc3545,
-      textColor: 0xffffff,
-    },
-  };
+  // 고정 스타일 값들
+  private readonly buttonWidth = 410;
+  private readonly buttonHeight = 50;
+  private readonly backgroundColor = 0x353739;
+  private readonly borderColor = 0x353739;
+  private readonly borderWidth = 2;
+  private readonly borderRadius = 10;
+  private readonly textColor = 0xffffff;
+  private readonly fontSize = 20;
 
   constructor(config: ActionButtonConfig, callbacks: ActionButtonCallbacks) {
     super();
-
-    // 기본값 설정
-    this.config = {
-      width: 410,
-      height: 50,
-      backgroundColor: 0x353739,
-      borderColor: 0x353739,
-      borderWidth: 2,
-      borderRadius: 10,
-      textColor: 0xffffff,
-      fontSize: 20,
-      fontWeight: "600",
-      ...config,
-    };
-
+    this.config = config;
     this.callbacks = callbacks;
 
     this.createButton();
@@ -100,10 +45,10 @@ export class ActionButton extends Container {
     // 텍스트 생성
     this.textElement = new Text(this.config.text, {
       fontFamily: "Pretendard",
-      fontSize: this.config.fontSize!,
-      fill: this.config.textColor!,
+      fontSize: this.fontSize,
+      fill: this.textColor,
       align: "center",
-      fontWeight: this.config.fontWeight! as any,
+      fontWeight: "600" as any,
     });
     this.textElement.anchor.set(0.5);
     this.textElement.x = 0;
@@ -139,25 +84,23 @@ export class ActionButton extends Container {
   private renderButton(): void {
     this.background.clear();
 
-    const halfWidth = this.config.width! / 2;
-    const halfHeight = this.config.height! / 2;
+    const halfWidth = this.buttonWidth / 2;
+    const halfHeight = this.buttonHeight / 2;
 
     this.background.roundRect(
       -halfWidth,
       -halfHeight,
-      this.config.width!,
-      this.config.height!,
-      this.config.borderRadius!
+      this.buttonWidth,
+      this.buttonHeight,
+      this.borderRadius
     );
-    this.background.fill(this.config.backgroundColor!);
+    this.background.fill(this.backgroundColor);
     this.background.stroke({
-      width: this.config.borderWidth!,
-      color: this.config.borderColor!,
+      width: this.borderWidth,
+      color: this.borderColor,
     });
   }
-
   // Public API 메서드들
-
   public setText(text: string): void {
     this.config.text = text;
     this.textElement.text = text;
@@ -165,38 +108,6 @@ export class ActionButton extends Container {
 
   public setAction(action: string): void {
     this.action = action;
-  }
-
-  public setStyle(style: ButtonStyle): void {
-    const styleConfig = this.defaultStyles[style];
-    this.updateConfig(styleConfig);
-  }
-
-  public updateConfig(partialConfig: Partial<ActionButtonConfig>): void {
-    this.config = { ...this.config, ...partialConfig };
-
-    // 텍스트 스타일 업데이트
-    if (partialConfig.text !== undefined) {
-      this.textElement.text = partialConfig.text;
-    }
-    if (partialConfig.textColor !== undefined) {
-      this.textElement.style.fill = partialConfig.textColor;
-    }
-    if (partialConfig.fontSize !== undefined) {
-      this.textElement.style.fontSize = partialConfig.fontSize;
-    }
-    if (partialConfig.fontWeight !== undefined) {
-      this.textElement.style.fontWeight = partialConfig.fontWeight as any;
-    }
-
-    // 위치 업데이트
-    if (partialConfig.x !== undefined || partialConfig.y !== undefined) {
-      this.x = this.config.x;
-      this.y = this.config.y;
-    }
-
-    // 버튼 재렌더링
-    this.renderButton();
   }
 
   public setPosition(x: number, y: number): void {
@@ -245,71 +156,5 @@ export class ActionButton extends Container {
     this.action = "";
     this.setText("");
     console.log("🔄 ActionButton reset complete");
-  }
-
-  // 빠른 생성 팩토리 메서드들
-  public static createPrimary(
-    text: string,
-    x: number,
-    y: number,
-    action: string,
-    callbacks: ActionButtonCallbacks
-  ): ActionButton {
-    const button = new ActionButton({ text, x, y }, callbacks);
-    button.setStyle(ButtonStyle.PRIMARY);
-    button.setAction(action);
-    return button;
-  }
-
-  public static createSecondary(
-    text: string,
-    x: number,
-    y: number,
-    action: string,
-    callbacks: ActionButtonCallbacks
-  ): ActionButton {
-    const button = new ActionButton({ text, x, y }, callbacks);
-    button.setStyle(ButtonStyle.SECONDARY);
-    button.setAction(action);
-    return button;
-  }
-
-  public static createWarning(
-    text: string,
-    x: number,
-    y: number,
-    action: string,
-    callbacks: ActionButtonCallbacks
-  ): ActionButton {
-    const button = new ActionButton({ text, x, y }, callbacks);
-    button.setStyle(ButtonStyle.WARNING);
-    button.setAction(action);
-    return button;
-  }
-
-  public static createSuccess(
-    text: string,
-    x: number,
-    y: number,
-    action: string,
-    callbacks: ActionButtonCallbacks
-  ): ActionButton {
-    const button = new ActionButton({ text, x, y }, callbacks);
-    button.setStyle(ButtonStyle.SUCCESS);
-    button.setAction(action);
-    return button;
-  }
-
-  public static createDanger(
-    text: string,
-    x: number,
-    y: number,
-    action: string,
-    callbacks: ActionButtonCallbacks
-  ): ActionButton {
-    const button = new ActionButton({ text, x, y }, callbacks);
-    button.setStyle(ButtonStyle.DANGER);
-    button.setAction(action);
-    return button;
   }
 }
