@@ -285,6 +285,17 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@bini-game-town/typo-trap@workspace:packages/game/typo-trap":
+  version: 0.0.0-use.local
+  resolution: "@bini-game-town/typo-trap@workspace:packages/game/typo-trap"
+  dependencies:
+    lottie-web: "npm:^5.13.0"
+    pixi.js: "npm:^8.9.2"
+    typescript: "npm:~5.8.3"
+    vite: "npm:^6.3.5"
+  languageName: unknown
+  linkType: soft
+
 "@bini-game-town/web@workspace:packages/web":
   version: 0.0.0-use.local
   resolution: "@bini-game-town/web@workspace:packages/web"
@@ -4309,17 +4320,6 @@ __metadata:
   checksum: 10c0/39117e346ff8ebd87ae1510b3a77d5d92dae5a89bde588c747d25da5c146603a99c8ee588c7ef80faaf123d89ed46f6dbd918d534d641083177d5fac38b8a1cb
   languageName: node
   linkType: hard
-
-"typo-trap@workspace:packages/game/typo-trap":
-  version: 0.0.0-use.local
-  resolution: "typo-trap@workspace:packages/game/typo-trap"
-  dependencies:
-    lottie-web: "npm:^5.13.0"
-    pixi.js: "npm:^8.9.2"
-    typescript: "npm:~5.8.3"
-    vite: "npm:^6.3.5"
-  languageName: unknown
-  linkType: soft
 
 "undici-types@npm:~6.21.0":
   version: 6.21.0
