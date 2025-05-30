@@ -399,8 +399,6 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
   }
 
   private showGameUI(): void {
-    this.removeSuccessAnimation();
-
     this.progressBarContainer.visible = true;
     this.successMessageText.visible = false;
     this.stateUIContainer.visible = false;
@@ -450,7 +448,6 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
 
   public onStageChange(stage: number): void {
     console.log(`🎯 Stage changed to: ${stage}`);
-    this.removeSuccessAnimation();
     this.createGridForStage(stage);
   }
 
@@ -522,6 +519,8 @@ export class PlayingScene extends Scene implements GameEventCallbacks {
 
     switch (currentState) {
       case PlayingState.SUCCESS:
+        this.removeSuccessAnimation();
+
         const hasNextStage = this.gameController.proceedToNextStage();
         if (!hasNextStage) {
           SceneController.getInstance().switchScene("RESULT");
