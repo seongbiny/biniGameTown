@@ -17,17 +17,6 @@ export class Scene extends Container {
   // 씬을 초기화
   public initialize() {
     this.isInitialized = true;
-    this.addCommonBackground();
-  }
-
-  // 모든 씬에 공통적으로 사용될 배경을 추가
-  protected addCommonBackground() {
-    // const background = Sprite.from("background");
-    // background.position.set(this.screenWidth / 2, this.screenHeight / 2);
-    // background.anchor.set(0.5);
-    // background.width = this.screenWidth;
-    // background.height = this.screenHeight;
-    // this.addChild(background);
   }
 
   // 씬을 재설정하는 메서드. 자식 클래스에서 오버라이드하여 구현 가능

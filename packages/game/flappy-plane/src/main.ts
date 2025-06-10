@@ -27,6 +27,8 @@ export class App {
       width: this.size.width,
       height: this.size.height,
       background: "#333333",
+      resolution: window.devicePixelRatio || 1,
+      autoDensity: true,
     });
     this.app.stage.scale.set(this.size.scale);
 
