@@ -1,3 +1,9 @@
+import PageContainer from "../components/layout/PageContainer";
+
 export default function LandingPage() {
-  return <div>Landing Page</div>;
+  return (
+    <PageContainer>
+      <div></div>
+    </PageContainer>
+  );
 }

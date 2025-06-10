@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
+import PageContainer from "../../components/layout/PageContainer";
 
 export default function MainPage() {
   return (
-    <div className="min-h-screen bg-red-500 flex items-center justify-center">
-      <div className="bg-blue-500 p-8 text-white">
+    <PageContainer>
+      <div className="w-full h-full bg-purple-600 flex flex-col items-center justify-center text-white">
         <h1 className="text-4xl font-bold mb-8">THE BINI PUZZLE GAME</h1>
         <Link
           to="/game/level"
@@ -12,6 +13,6 @@ export default function MainPage() {
           Get in Start
         </Link>
       </div>
-    </div>
+    </PageContainer>
   );
 }
