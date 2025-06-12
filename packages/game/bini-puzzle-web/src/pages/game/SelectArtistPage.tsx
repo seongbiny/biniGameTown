@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import PageContainer from "../../components/layout/PageContainer";
+import { Link } from "react-router-dom";
 
 const artists = [
   { name: "NJZ", src: "/images/njz.png", size: 200 },
@@ -51,9 +52,10 @@ export default function SelectArtistPage() {
                 key={artist.name}
                 className={`flex ${index % 2 === 0 ? "justify-start" : "justify-end"}`}
               >
-                {/* 고정 크기 원형 컨테이너 */}
-                <div
-                  className="rounded-full border-2 border-black overflow-hidden cursor-pointer"
+                <Link
+                  to="/game/member"
+                  state={{ artist: artist }}
+                  className="rounded-full border-2 border-black overflow-hidden cursor-pointer transition-transform duration-300 ease-in-out hover:scale-105"
                   style={{
                     width: `${artist.size}px`,
                     height: `${artist.size}px`,
@@ -65,7 +67,7 @@ export default function SelectArtistPage() {
                     alt={artist.name}
                     className="w-full h-full object-cover transition-transform duration-300 ease-in-out hover:scale-110"
                   />
-                </div>
+                </Link>
               </div>
             ))}
           </div>
