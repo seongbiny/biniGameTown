@@ -32,8 +32,9 @@ export default function LandingPage() {
           </div>
 
           <div className="space-y-3">
+            {/* 게스트 화면 추가 */}
             <Link
-              to="/signin"
+              to="/game/level"
               className="flex items-center justify-center font-bold"
               style={{
                 width: "335px",
