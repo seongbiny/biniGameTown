@@ -301,6 +301,7 @@ __metadata:
   resolution: "@bini-game-town/web@workspace:packages/web"
   dependencies:
     "@eslint/js": "npm:^9.25.0"
+    "@supabase/supabase-js": "npm:^2.52.1"
     "@tailwindcss/vite": "npm:^4.1.5"
     "@types/react": "npm:^19.1.2"
     "@types/react-dom": "npm:^19.1.2"
@@ -311,10 +312,12 @@ __metadata:
     globals: "npm:^16.0.0"
     react: "npm:^19.1.0"
     react-dom: "npm:^19.1.0"
+    react-router-dom: "npm:^7.7.0"
     tailwindcss: "npm:^4.1.5"
     typescript: "npm:~5.8.3"
     typescript-eslint: "npm:^8.30.1"
     vite: "npm:^6.3.5"
+    zustand: "npm:^5.0.6"
   languageName: unknown
   linkType: soft
 
@@ -1167,6 +1170,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@supabase/auth-js@npm:2.71.1":
+  version: 2.71.1
+  resolution: "@supabase/auth-js@npm:2.71.1"
+  dependencies:
+    "@supabase/node-fetch": "npm:^2.6.14"
+  checksum: 10c0/970966525119dea83067ff3b87a219e5b357ffad3c22e19b00ceb83fc30dd485815a7ceb78eeedf9436f8c1674b5a9ac96929f3a82a50091d3ad66d1bc3215d4
+  languageName: node
+  linkType: hard
+
 "@supabase/functions-js@npm:2.4.4":
   version: 2.4.4
   resolution: "@supabase/functions-js@npm:2.4.4"
@@ -1176,7 +1188,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@supabase/node-fetch@npm:2.6.15, @supabase/node-fetch@npm:^2.6.14":
+"@supabase/functions-js@npm:2.4.5":
+  version: 2.4.5
+  resolution: "@supabase/functions-js@npm:2.4.5"
+  dependencies:
+    "@supabase/node-fetch": "npm:^2.6.14"
+  checksum: 10c0/43d0a40e863e20cadae38de65930c203f50c625bad91736bf78c095e347131ea3328716a43dad58fb8d058c69b901b41fdc062e77221196d8dfc93ad772519b5
+  languageName: node
+  linkType: hard
+
+"@supabase/node-fetch@npm:2.6.15, @supabase/node-fetch@npm:^2.6.13, @supabase/node-fetch@npm:^2.6.14":
   version: 2.6.15
   resolution: "@supabase/node-fetch@npm:2.6.15"
   dependencies:
@@ -1191,6 +1212,19 @@ __metadata:
   dependencies:
     "@supabase/node-fetch": "npm:^2.6.14"
   checksum: 10c0/1d14adc841f720e0035045f8b06cf2cb9f3b0a83ac903e268d5afb80b64d240ae64cb24372e0e9c857420b07010bfdb9a806f024fe60ac13468fd791ada2eb7f
+  languageName: node
+  linkType: hard
+
+"@supabase/realtime-js@npm:2.11.15":
+  version: 2.11.15
+  resolution: "@supabase/realtime-js@npm:2.11.15"
+  dependencies:
+    "@supabase/node-fetch": "npm:^2.6.13"
+    "@types/phoenix": "npm:^1.6.6"
+    "@types/ws": "npm:^8.18.1"
+    isows: "npm:^1.0.7"
+    ws: "npm:^8.18.2"
+  checksum: 10c0/bcb623db5cda0ddd8a30231ced3cdb09398a55a210aedfdc2b351355f1db97a3309504f27966098d393e5c45b20e239630c38fec7df2c9636f7c0bf1e26b1dc5
   languageName: node
   linkType: hard
 
@@ -1226,6 +1260,20 @@ __metadata:
     "@supabase/realtime-js": "npm:2.11.2"
     "@supabase/storage-js": "npm:2.7.1"
   checksum: 10c0/43f5500b4cee89fa975ef13036846e6406d7719c79e1c9563b9e6a54529aa7b8d17e86bd0cd2cd2394ce6894e85628f43a29809572a438d2fc493175bb25ac25
+  languageName: node
+  linkType: hard
+
+"@supabase/supabase-js@npm:^2.52.1":
+  version: 2.52.1
+  resolution: "@supabase/supabase-js@npm:2.52.1"
+  dependencies:
+    "@supabase/auth-js": "npm:2.71.1"
+    "@supabase/functions-js": "npm:2.4.5"
+    "@supabase/node-fetch": "npm:2.6.15"
+    "@supabase/postgrest-js": "npm:1.19.4"
+    "@supabase/realtime-js": "npm:2.11.15"
+    "@supabase/storage-js": "npm:2.7.1"
+  checksum: 10c0/94122c084741ad1f3849050c295094c759a2e670a65f7e0296f671e0ce20b66c32dcb9ac9c04b8a9c1e791244fbcaf36d3034de5388a5417bc1de2bc902b40aa
   languageName: node
   linkType: hard
 
@@ -1500,7 +1548,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/phoenix@npm:^1.5.4":
+"@types/phoenix@npm:^1.5.4, @types/phoenix@npm:^1.6.6":
   version: 1.6.6
   resolution: "@types/phoenix@npm:1.6.6"
   checksum: 10c0/4dfcb3fd36341ed5500de030291af14163c599857e00d2d4ff065d4c4600317d5d20aa170913fb9609747a09436e3add44db7d0c709bdf80f36cddcc67a42021
@@ -1525,7 +1573,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/ws@npm:^8.5.10":
+"@types/ws@npm:^8.18.1, @types/ws@npm:^8.5.10":
   version: 8.18.1
   resolution: "@types/ws@npm:8.18.1"
   dependencies:
@@ -2248,6 +2296,13 @@ __metadata:
   version: 0.7.2
   resolution: "cookie@npm:0.7.2"
   checksum: 10c0/9596e8ccdbf1a3a88ae02cf5ee80c1c50959423e1022e4e60b91dd87c622af1da309253d8abdb258fb5e3eacb4f08e579dc58b4897b8087574eee0fd35dfa5d2
+  languageName: node
+  linkType: hard
+
+"cookie@npm:^1.0.1":
+  version: 1.0.2
+  resolution: "cookie@npm:1.0.2"
+  checksum: 10c0/fd25fe79e8fbcfcaf6aa61cd081c55d144eeeba755206c058682257cb38c4bd6795c6620de3f064c740695bb65b7949ebb1db7a95e4636efb8357a335ad3f54b
   languageName: node
   linkType: hard
 
@@ -3882,6 +3937,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"isows@npm:^1.0.7":
+  version: 1.0.7
+  resolution: "isows@npm:1.0.7"
+  peerDependencies:
+    ws: "*"
+  checksum: 10c0/43c41fe89c7c07258d0be3825f87e12da8ac9023c5b5ae6741ec00b2b8169675c04331ea73ef8c172d37a6747066f4dc93947b17cd369f92828a3b3e741afbda
+  languageName: node
+  linkType: hard
+
 "iterator.prototype@npm:^1.1.4":
   version: 1.1.5
   resolution: "iterator.prototype@npm:1.1.5"
@@ -4868,6 +4932,34 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-router-dom@npm:^7.7.0":
+  version: 7.7.0
+  resolution: "react-router-dom@npm:7.7.0"
+  dependencies:
+    react-router: "npm:7.7.0"
+  peerDependencies:
+    react: ">=18"
+    react-dom: ">=18"
+  checksum: 10c0/1cc6ede9f728b3a141e730e00e86fa7f0db645c1ad5a3e4a156d373fb1e091ce9a368019c6fbf42d5fcc8a00bb44610248ca2a44907a7cc50fbf8b186adcfed6
+  languageName: node
+  linkType: hard
+
+"react-router@npm:7.7.0":
+  version: 7.7.0
+  resolution: "react-router@npm:7.7.0"
+  dependencies:
+    cookie: "npm:^1.0.1"
+    set-cookie-parser: "npm:^2.6.0"
+  peerDependencies:
+    react: ">=18"
+    react-dom: ">=18"
+  peerDependenciesMeta:
+    react-dom:
+      optional: true
+  checksum: 10c0/04b02b473a743978ec7b5292484706b87c74d3e8d407dba886204586ba2d7a224a5413f0a7969fb28899b8804f0e6b0fde1c2a4f957901eb8a9a6541a25630f2
+  languageName: node
+  linkType: hard
+
 "react@npm:^19.1.0":
   version: 19.1.0
   resolution: "react@npm:19.1.0"
@@ -5251,6 +5343,13 @@ __metadata:
     parseurl: "npm:^1.3.3"
     send: "npm:^1.2.0"
   checksum: 10c0/30e2ed1dbff1984836cfd0c65abf5d3f3f83bcd696c99d2d3c97edbd4e2a3ff4d3f87108a7d713640d290a7b6fe6c15ddcbc61165ab2eaad48ea8d3b52c7f913
+  languageName: node
+  linkType: hard
+
+"set-cookie-parser@npm:^2.6.0":
+  version: 2.7.1
+  resolution: "set-cookie-parser@npm:2.7.1"
+  checksum: 10c0/060c198c4c92547ac15988256f445eae523f57f2ceefeccf52d30d75dedf6bff22b9c26f756bd44e8e560d44ff4ab2130b178bd2e52ef5571bf7be3bd7632d9a
   languageName: node
   linkType: hard
 
@@ -6167,6 +6266,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ws@npm:^8.18.2":
+  version: 8.18.3
+  resolution: "ws@npm:8.18.3"
+  peerDependencies:
+    bufferutil: ^4.0.1
+    utf-8-validate: ">=5.0.2"
+  peerDependenciesMeta:
+    bufferutil:
+      optional: true
+    utf-8-validate:
+      optional: true
+  checksum: 10c0/eac918213de265ef7cb3d4ca348b891a51a520d839aa51cdb8ca93d4fa7ff9f6ccb339ccee89e4075324097f0a55157c89fa3f7147bde9d8d7e90335dc087b53
+  languageName: node
+  linkType: hard
+
 "yallist@npm:^3.0.2":
   version: 3.1.1
   resolution: "yallist@npm:3.1.1"
@@ -6208,5 +6322,26 @@ __metadata:
   version: 3.24.4
   resolution: "zod@npm:3.24.4"
   checksum: 10c0/ab3112f017562180a41a0f83d870b333677f7d6b77f106696c56894567051b91154714a088149d8387a4f50806a2520efcb666f108cd384a35c236a191186d91
+  languageName: node
+  linkType: hard
+
+"zustand@npm:^5.0.6":
+  version: 5.0.6
+  resolution: "zustand@npm:5.0.6"
+  peerDependencies:
+    "@types/react": ">=18.0.0"
+    immer: ">=9.0.6"
+    react: ">=18.0.0"
+    use-sync-external-store: ">=1.2.0"
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+    immer:
+      optional: true
+    react:
+      optional: true
+    use-sync-external-store:
+      optional: true
+  checksum: 10c0/28e0c83978173741fe0d1f8c8d51b2708d6ad3d49968585c179a6ece45b7b149e489f89af9764b56dced842efe2914d89d5ba2d3890e026a4e4b072308fcd11c
   languageName: node
   linkType: hard
