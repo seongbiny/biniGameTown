@@ -1,32 +1,75 @@
-import "./App.css";
+import { useEffect } from 'react';
+import './App.css';
+import { useAuthStore } from './stores/authStore';
+import { Navigate, Route, Routes } from 'react-router-dom';
+import SignInPage from './pages/SignInPage';
+import ProtectedRoute from './pages/ProtectedRoute';
+import MainPage from './pages/MainPage';
+import AuthCallback from './pages/AuthCallback';
+import { supabase } from './lib/supabaseClient';
 
 function App() {
+  const { session, setSession } = useAuthStore();
+
+  useEffect(() => {
+    const getSession = async () => {
+      try {
+        const {
+          data: { session },
+          error,
+        } = await supabase.auth.getSession();
+
+        if (error) {
+          console.error('세션 가져오기 오류:', error);
+          return;
+        }
+
+        setSession(session);
+      } catch (err) {
+        console.error('세션 초기화 오류:', err);
+      }
+    };
+
+    getSession();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        setSession(session);
+      } else if (event === 'SIGNED_OUT') {
+        setSession(null);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [setSession]);
   return (
-    <div className="text-center p-8">
-      <h1 className="text-3xl font-bold mb-8">비니 게임 타운</h1>
-      <div className="flex justify-center gap-4">
-        <a
-          href="/game/bini-puzzle/"
-          target="_self"
-          className="w-36 h-24 bg-blue-100 border-2 border-blue-500 rounded-lg flex items-center justify-center text-lg font-semibold hover:bg-blue-200 transition"
-        >
-          bini-puzzle
-        </a>
-        <a
-          href="/game/flappy-plane/"
-          target="_self"
-          className="w-36 h-24 bg-blue-100 border-2 border-blue-500 rounded-lg flex items-center justify-center text-lg font-semibold hover:bg-blue-200 transition"
-        >
-          flappy-plane
-        </a>
-        <a
-          href="/game/typo-trap/"
-          target="_self"
-          className="w-36 h-24 bg-blue-100 border-2 border-blue-500 rounded-lg flex items-center justify-center text-lg font-semibold hover:bg-blue-200 transition"
-        >
-          typo-trap
-        </a>
-      </div>
+    <div className="App">
+      <Routes>
+        <Route
+          path="/"
+          element={session ? <Navigate to="/main" replace /> : <Navigate to="/sign-in" replace />}
+        />
+
+        <Route
+          path="/sign-in"
+          element={session ? <Navigate to="/main" replace /> : <SignInPage />}
+        />
+
+        <Route path="/auth/callback" element={<AuthCallback />} />
+
+        <Route
+          path="/main"
+          element={
+            <ProtectedRoute>
+              <MainPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
     </div>
   );
 }
