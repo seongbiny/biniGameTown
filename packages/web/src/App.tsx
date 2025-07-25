@@ -7,6 +7,7 @@ import ProtectedRoute from './pages/ProtectedRoute';
 import MainPage from './pages/MainPage';
 import AuthCallback from './pages/AuthCallback';
 import { supabase } from './lib/supabaseClient';
+import RankingPage from './pages/RankingPage';
 
 function App() {
   const { session, setSession } = useAuthStore();
@@ -41,7 +42,6 @@ function App() {
         setSession(null);
       }
     });
-
     return () => subscription.unsubscribe();
   }, [setSession]);
   return (
@@ -67,6 +67,8 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        <Route path="/ranking" element={<RankingPage />} />
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
