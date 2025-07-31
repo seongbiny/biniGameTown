@@ -1,8 +1,10 @@
 import { useAuthStore } from '../stores/authStore';
 import { supabase } from '../lib/supabaseClient';
+import { useNavigate } from 'react-router-dom';
 
 const MainPage = () => {
   const { session } = useAuthStore();
+  const navigate = useNavigate();
 
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut();
@@ -11,6 +13,8 @@ const MainPage = () => {
       console.error('로그아웃 오류:', error);
     }
   };
+
+  console.log(session);
 
   return (
     <div className="text-center p-8">
@@ -27,6 +31,8 @@ const MainPage = () => {
           </button>
         </div>
       )}
+
+      <button onClick={() => navigate('/ranking')}>랭킹</button>
 
       <div className="flex justify-center gap-4">
         <a
