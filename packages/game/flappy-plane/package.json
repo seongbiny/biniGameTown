@@ -16,7 +16,6 @@
     "vite": "^6.2.0"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.53.0",
     "lottie-web": "^5.12.2",
     "matter-js": "^0.20.0",
     "pixi.js": "^8.9.1"

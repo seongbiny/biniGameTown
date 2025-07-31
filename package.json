@@ -26,6 +26,7 @@
   "devDependencies": {
     "@edenyun/eslint-config": "^1.0.4",
     "@edenyun/prettier-config": "^1.0.2",
+    "@supabase/supabase-js": "^2.53.0",
     "eslint": "^9.23.0",
     "typescript": "^5.8.2"
   }
