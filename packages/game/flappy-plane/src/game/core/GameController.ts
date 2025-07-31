@@ -8,6 +8,7 @@ import SceneController from './SceneController';
 import { SceneType } from '../types';
 import { ScoreManager } from '../component/view/ScoreManager';
 import { SoundPlayer } from './SoundPlayer';
+import { submitGameResult } from '../manager/gameRecordService';
 
 const { GAME_WIDTH } = DEFAULT_CONFIG;
 export class GameController extends EventEmitter {
@@ -97,6 +98,8 @@ export class GameController extends EventEmitter {
     const currentScore = this.scoreManager.getScore();
     this.emit('gameOver', currentScore);
 
+    submitGameResult(currentScore);
+
     // 점수가 초기화되지 않고 유지된 상태로 GameOverScene 전환
     setTimeout(() => {
       this.stopPhysics();
@@ -154,8 +157,7 @@ export class GameController extends EventEmitter {
   private isPlayerObstacleCollision(bodyA: Body, bodyB: Body): boolean {
     return (
       (bodyA.label === 'player' &&
-        (bodyB.label === 'obstacle-top' ||
-          bodyB.label === 'obstacle-bottom')) ||
+        (bodyB.label === 'obstacle-top' || bodyB.label === 'obstacle-bottom')) ||
       (bodyB.label === 'player' &&
         (bodyA.label === 'obstacle-top' || bodyA.label === 'obstacle-bottom'))
     );
@@ -171,8 +173,7 @@ export class GameController extends EventEmitter {
     for (const obstacle of obstacles) {
       if (obstacle.isActive() && !obstacle.isPassed()) {
         // 통과 감지 지점을 장애물 좌측 가장자리로 설정 (파이프 중간이 아님)
-        const passPoint =
-          obstacle.getCenterX() - (obstacle.getWidth() / 2) * 0.5;
+        const passPoint = obstacle.getCenterX() - (obstacle.getWidth() / 2) * 0.5;
 
         if (playerX > passPoint) {
           this.soundPlayer.play('pass');

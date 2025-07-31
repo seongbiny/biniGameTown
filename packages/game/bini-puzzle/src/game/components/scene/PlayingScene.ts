@@ -10,16 +10,10 @@ import {
   setAnimating,
   updatePuzzleState,
 } from '../../core/gameState';
-import {
-  createTiles,
-  preloadTileAssets,
-  updateTilesUI,
-} from '../view/TileView';
-import {
-  createStatusDisplay,
-  updateStatusDisplay,
-} from '../view/StatusDisplay';
+import { createTiles, preloadTileAssets, updateTilesUI } from '../view/TileView';
+import { createStatusDisplay, updateStatusDisplay } from '../view/StatusDisplay';
 import { COLORS, GAME_HEIGHT, GAME_WIDTH } from '../../../config/constants';
+import { submitGameResult } from '../../core/gameRecordService';
 
 export default class PlayingScene {
   private app: Application;
@@ -31,11 +25,7 @@ export default class PlayingScene {
   private statusText: any;
   private timer: NodeJS.Timeout | null = null;
 
-  constructor(
-    app: Application,
-    switchScene: (status: GameState) => void,
-    gameState: GameState
-  ) {
+  constructor(app: Application, switchScene: (status: GameState) => void, gameState: GameState) {
     this.app = app;
     this.switchScene = switchScene;
     this.gameState = gameState;
@@ -70,7 +60,7 @@ export default class PlayingScene {
       gridSize,
       cellSize,
       padding,
-      (row, col) => this.handleTileClick(row, col)
+      (row, col) => this.handleTileClick(row, col),
     );
     this.tiles = tiles;
 
@@ -79,15 +69,11 @@ export default class PlayingScene {
     gridContainer.addChild(gridBackground, tilesContainer);
     gridContainer.position.set(
       GAME_WIDTH / 2 - totalSize / 2,
-      GAME_HEIGHT / 2 - 50 - totalSize / 2
+      GAME_HEIGHT / 2 - 50 - totalSize / 2,
     );
 
     // 4. 상태 표시 생성
-    this.statusText = createStatusDisplay(
-      GAME_WIDTH / 2,
-      GAME_HEIGHT - 100,
-      this.state
-    );
+    this.statusText = createStatusDisplay(GAME_WIDTH / 2, GAME_HEIGHT - 100, this.state);
 
     // 5. 씬 컨테이너에 추가
     this.sceneContainer.addChild(gridContainer, this.statusText);
@@ -105,12 +91,7 @@ export default class PlayingScene {
     if (this.state.isAnimating || this.state.isComplete) return;
 
     // 타일 이동 가능 여부 확인
-    const result = processTileClick(
-      row,
-      col,
-      this.state.puzzle,
-      this.state.puzzle.length
-    );
+    const result = processTileClick(row, col, this.state.puzzle, this.state.puzzle.length);
 
     if (result.canMove && result.emptyCell) {
       // 애니메이션 상태 설정
@@ -125,7 +106,7 @@ export default class PlayingScene {
         () => this.handleTileAnimationComplete(row, col, emptyCell),
         (isAnimating) => {
           this.state = setAnimating(this.state, isAnimating);
-        }
+        },
       );
     } else if (result.emptyCell) {
       // 인접하지 않은 타일이면 떨림 애니메이션 실행
@@ -138,24 +119,14 @@ export default class PlayingScene {
   private handleTileAnimationComplete(
     row: number,
     col: number,
-    emptyCell: { row: number; col: number }
+    emptyCell: { row: number; col: number },
   ): void {
-    const newPuzzle = moveTilePure(
-      this.state.puzzle,
-      row,
-      col,
-      emptyCell.row,
-      emptyCell.col
-    );
+    const newPuzzle = moveTilePure(this.state.puzzle, row, col, emptyCell.row, emptyCell.col);
 
     this.state = incrementMoves(this.state);
     this.state = updatePuzzleState(this.state, newPuzzle);
 
-    updateTilesUI(
-      this.state.puzzle,
-      this.tiles,
-      (340 - 20) / this.state.puzzle.length
-    );
+    updateTilesUI(this.state.puzzle, this.tiles, (340 - 20) / this.state.puzzle.length);
     updateStatusDisplay(this.statusText, this.state);
 
     if (this.state.isComplete) {
@@ -167,6 +138,8 @@ export default class PlayingScene {
     if (this.timer) clearInterval(this.timer);
 
     updateStatusDisplay(this.statusText, this.state, true);
+
+    submitGameResult(this.state.moves);
 
     setTimeout(() => {
       this.switchScene({
