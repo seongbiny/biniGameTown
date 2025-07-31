@@ -9,6 +9,7 @@
     "lint": "eslint ."
   },
   "devDependencies": {
+    "@supabase/supabase-js": "^2.53.0",
     "@types/matter-js": "^0.19.8",
     "@types/node": "^22.14.0",
     "eslint": "^9.23.0",

@@ -251,6 +251,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@bini-game-town/bini-puzzle@workspace:packages/game/bini-puzzle"
   dependencies:
+    "@supabase/supabase-js": "npm:^2.53.0"
     "@types/node": "npm:^22.13.4"
     eslint: "npm:^9.20.1"
     gsap: "npm:^3.12.7"
@@ -264,6 +265,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@bini-game-town/flappy-plane@workspace:packages/game/flappy-plane"
   dependencies:
+    "@supabase/supabase-js": "npm:^2.53.0"
     "@types/matter-js": "npm:^0.19.8"
     "@types/node": "npm:^22.14.0"
     eslint: "npm:^9.23.0"
@@ -288,6 +290,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@bini-game-town/typo-trap@workspace:packages/game/typo-trap"
   dependencies:
+    "@supabase/supabase-js": "npm:^2.53.0"
     lottie-web: "npm:^5.13.0"
     pixi.js: "npm:^8.9.2"
     typescript: "npm:~5.8.3"
@@ -2057,7 +2060,6 @@ __metadata:
   dependencies:
     "@edenyun/eslint-config": "npm:^1.0.4"
     "@edenyun/prettier-config": "npm:^1.0.2"
-    "@supabase/supabase-js": "npm:^2.53.0"
     eslint: "npm:^9.23.0"
     typescript: "npm:^5.8.2"
   languageName: unknown
