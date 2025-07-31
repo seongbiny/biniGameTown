@@ -289,6 +289,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@bini-game-town/typo-trap@workspace:packages/game/typo-trap"
   dependencies:
+    "@supabase/supabase-js": "npm:^2.52.1"
     lottie-web: "npm:^5.13.0"
     pixi.js: "npm:^8.9.2"
     typescript: "npm:~5.8.3"

@@ -1,7 +1,7 @@
-import { Container } from "pixi.js";
-import { GAME_CONFIG } from "../../types";
-import { GridCell, CellState } from "./GridCell";
-import type { GridCellConfig, GridCellCallbacks } from "./GridCell";
+import { Container } from 'pixi.js';
+import { GAME_CONFIG } from '../../types';
+import { GridCell, CellState } from './GridCell';
+import type { GridCellConfig, GridCellCallbacks } from './GridCell';
 
 export interface Position {
   row: number;
@@ -40,17 +40,17 @@ export class GameGrid extends Container implements GridCellCallbacks {
   private readonly STAGE_GAPS = [10, 7, 5, 3, 3];
   private readonly STAGE_FONT_SIZES = [32, 28, 24, 20, 18];
   private readonly STAGE_BASE_DATA: StageConfig[] = [
-    { correctWord: "재촉", typoWord: "재쵹", gridSize: 2 },
-    { correctWord: "훈민정음", typoWord: "휸민정음", gridSize: 3 },
-    { correctWord: "세종대왕", typoWord: "새종대왕", gridSize: 4 },
+    { correctWord: '재촉', typoWord: '재쵹', gridSize: 2 },
+    { correctWord: '훈민정음', typoWord: '휸민정음', gridSize: 3 },
+    { correctWord: '세종대왕', typoWord: '새종대왕', gridSize: 4 },
     {
-      correctWord: "대한\n민국\n만세",
-      typoWord: "댸한\n민국\n만세",
+      correctWord: '대한\n민국\n만세',
+      typoWord: '댸한\n민국\n만세',
       gridSize: 5,
     },
     {
-      correctWord: "개미\n허리\n왕잠\n자리",
-      typoWord: "걔미\n허리\n왕잠\n자리",
+      correctWord: '개미\n허리\n왕잠\n자리',
+      typoWord: '걔미\n허리\n왕잠\n자리',
       gridSize: 5,
     },
   ];
@@ -93,7 +93,7 @@ export class GameGrid extends Container implements GridCellCallbacks {
       this.correctPositions.push({ row: randomRow, col: randomCol });
     });
 
-    console.log("🎯 GameGrid 정답 위치 생성:", this.correctPositions);
+    console.log('🎯 GameGrid 정답 위치 생성:', this.correctPositions);
   }
 
   public getCorrectPositions(): Position[] {
@@ -138,15 +138,13 @@ export class GameGrid extends Container implements GridCellCallbacks {
       }
     }
 
-    console.log(
-      `🎮 GameGrid created ${this.gridCells.length} cells for stage ${stage}`
-    );
+    console.log(`🎮 GameGrid created ${this.gridCells.length} cells for stage ${stage}`);
   }
 
   // GridCellCallbacks 인터페이스 구현
   public onCellClick(row: number, col: number, cell: GridCell): void {
     if (!this.isInteractionEnabled) {
-      console.log("🚫 그리드 상호작용이 비활성화됨");
+      console.log('🚫 그리드 상호작용이 비활성화됨');
       return;
     }
 
@@ -172,7 +170,7 @@ export class GameGrid extends Container implements GridCellCallbacks {
     this.gridCells.forEach((cell) => {
       cell.enableInteraction();
     });
-    console.log("✅ GameGrid 상호작용 활성화");
+    console.log('✅ GameGrid 상호작용 활성화');
   }
 
   public disableInteraction(): void {
@@ -180,23 +178,17 @@ export class GameGrid extends Container implements GridCellCallbacks {
     this.gridCells.forEach((cell) => {
       cell.disableInteraction();
     });
-    console.log("❌ GameGrid 상호작용 비활성화");
+    console.log('❌ GameGrid 상호작용 비활성화');
   }
 
-  public highlightWrongAndCorrectCells(
-    selectedPos: Position,
-    correctPos: Position
-  ): void {
+  public highlightWrongAndCorrectCells(selectedPos: Position, correctPos: Position): void {
     this.gridCells.forEach((cell) => {
       const cellPos = cell.getPosition();
 
       if (cellPos.row === selectedPos.row && cellPos.col === selectedPos.col) {
         // 선택한 셀 (틀린 답) - 연분홍색
         cell.setState(CellState.WRONG);
-      } else if (
-        cellPos.row === correctPos.row &&
-        cellPos.col === correctPos.col
-      ) {
+      } else if (cellPos.row === correctPos.row && cellPos.col === correctPos.col) {
         // 정답 셀 - 검은색
         cell.setState(CellState.CORRECT);
       } else {
@@ -247,14 +239,12 @@ export class GameGrid extends Container implements GridCellCallbacks {
     this.generateRandomizedStageWords();
     this.currentStage = 1;
     this.isInteractionEnabled = true;
-    console.log("🔄 GameGrid 리셋 완료");
+    console.log('🔄 GameGrid 리셋 완료');
   }
 
   // 디버깅 메서드
   public getDebugInfo(): string {
-    const cellInfo = this.gridCells
-      .map((cell) => cell.getDebugInfo())
-      .join("\n");
+    const cellInfo = this.gridCells.map((cell) => cell.getDebugInfo()).join('\n');
     return `GameGrid Stage ${this.currentStage}:\n${cellInfo}`;
   }
 }
