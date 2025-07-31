@@ -2084,6 +2084,7 @@ __metadata:
   dependencies:
     "@edenyun/eslint-config": "npm:^1.0.4"
     "@edenyun/prettier-config": "npm:^1.0.2"
+    eslint: "npm:^9.23.0"
     typescript: "npm:^5.8.2"
   languageName: unknown
   linkType: soft
