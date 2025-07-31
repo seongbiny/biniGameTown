@@ -13,7 +13,7 @@ export const submitGameResult = async (stage: number) => {
 
     const record = {
       user_id: user.id,
-      game_name: 'typo-trap',
+      game_name: 'bini-puzzle',
       score: stage,
     };
 
