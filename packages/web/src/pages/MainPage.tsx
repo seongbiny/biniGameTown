@@ -1,61 +1,58 @@
 import { useAuthStore } from '../stores/authStore';
-import { supabase } from '../lib/supabaseClient';
-import { useNavigate } from 'react-router-dom';
+import Header from '../components/Header';
 
 const MainPage = () => {
   const { session } = useAuthStore();
-  const navigate = useNavigate();
-
-  const handleSignOut = async () => {
-    const { error } = await supabase.auth.signOut();
-
-    if (error) {
-      console.error('로그아웃 오류:', error);
-    }
-  };
-
-  console.log(session);
 
   return (
-    <div className="text-center p-8">
-      <h1 className="text-3xl font-bold mb-8">비니 게임 타운</h1>
+    <div>
+      <Header signIn={!!session} />
 
-      {session && (
-        <div className="mb-8">
-          <p>환영합니다, {session.user.email}!</p>
-          <button
-            onClick={handleSignOut}
-            className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition"
+      <div className="flex items-center justify-center mt-[87px] flex-col gap-[16px] px-[20px]">
+        <div className="flex gap-[16px]">
+          <a
+            className="flex-1 hover:cursor-pointer overflow-hidden rounded-[16px]"
+            href="/game/bini-puzzle/"
+            target="_self"
           >
-            로그아웃
-          </button>
+            <img
+              src="/thebinipuzzlegame.png"
+              alt="thebinipuzzlegame"
+              className="w-full h-auto hover:scale-110 transition-all duration-300"
+            />
+          </a>
+          <a
+            className="flex-1 hover:cursor-pointer overflow-hidden rounded-[16px]"
+            href="/game/flappy-plane/"
+            target="_self"
+          >
+            <img
+              src="/flappyplane.png"
+              alt="flappyplane"
+              className="w-full h-auto hover:scale-110 transition-all duration-300"
+            />
+          </a>
         </div>
-      )}
-
-      <button onClick={() => navigate('/ranking')}>랭킹</button>
-
-      <div className="flex justify-center gap-4">
-        <a
-          href="/game/bini-puzzle/"
-          target="_self"
-          className="w-36 h-24 bg-blue-100 border-2 border-blue-500 rounded-lg flex items-center justify-center text-lg font-semibold hover:bg-blue-200 transition"
-        >
-          bini-puzzle
-        </a>
-        <a
-          href="/game/flappy-plane/"
-          target="_self"
-          className="w-36 h-24 bg-blue-100 border-2 border-blue-500 rounded-lg flex items-center justify-center text-lg font-semibold hover:bg-blue-200 transition"
-        >
-          flappy-plane
-        </a>
-        <a
-          href="/game/typo-trap/"
-          target="_self"
-          className="w-36 h-24 bg-blue-100 border-2 border-blue-500 rounded-lg flex items-center justify-center text-lg font-semibold hover:bg-blue-200 transition"
-        >
-          typo-trap
-        </a>
+        <div className="flex gap-[16px]">
+          <a
+            className="flex-1 hover:cursor-pointer overflow-hidden rounded-[16px]"
+            href="/game/btypoe-trap/"
+            target="_self"
+          >
+            <img
+              src="/typotrap.png"
+              alt="typotrap"
+              className="w-full h-auto hover:scale-110 transition-all duration-300"
+            />
+          </a>
+          <div className="flex-1 hover:cursor-pointer overflow-hidden rounded-[16px] border-[#4A5256] border-[1px]">
+            <img
+              src="/commingsoon.png"
+              alt="commingsoon"
+              className="w-full h-auto hover:scale-110 transition-all duration-300"
+            />
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -1,1 +1,32 @@
-@import "tailwindcss";
+@import 'tailwindcss';
+
+.App {
+  /* 393px 고정 너비, 전체 화면 높이 */
+  width: 393px;
+  height: 100vh;
+  max-height: 100vh;
+
+  /* 스크롤 방지 */
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  /* 모바일 앱 느낌의 디자인 */
+  background: #121212;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+
+  /* 작은 화면에서 반응형 처리 */
+  @media (max-width: 450px) {
+    width: 100vw;
+    max-width: 393px;
+  }
+}
+
+/* 전체 컨테이너 중앙 정렬 */
+.app-container {
+  min-height: 100vh;
+  background: #121212;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}

@@ -8,6 +8,7 @@ import MainPage from './pages/MainPage';
 import AuthCallback from './pages/AuthCallback';
 import { supabase } from './lib/supabaseClient';
 import RankingPage from './pages/RankingPage';
+import SplashPage from './pages/SplashPage';
 
 function App() {
   const { session, setSession } = useAuthStore();
@@ -45,33 +46,32 @@ function App() {
     return () => subscription.unsubscribe();
   }, [setSession]);
   return (
-    <div className="App">
-      <Routes>
-        <Route
-          path="/"
-          element={session ? <Navigate to="/main" replace /> : <Navigate to="/sign-in" replace />}
-        />
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="App w-[393px] h-screen max-h-screen overflow-hidden">
+        <Routes>
+          <Route path="/" element={<SplashPage />} />
 
-        <Route
-          path="/sign-in"
-          element={session ? <Navigate to="/main" replace /> : <SignInPage />}
-        />
+          <Route
+            path="/sign-in"
+            element={session ? <Navigate to="/main" replace /> : <SignInPage />}
+          />
 
-        <Route path="/auth/callback" element={<AuthCallback />} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
 
-        <Route
-          path="/main"
-          element={
-            <ProtectedRoute>
-              <MainPage />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/main"
+            element={
+              <ProtectedRoute>
+                <MainPage />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route path="/ranking" element={<RankingPage />} />
+          <Route path="/ranking" element={<RankingPage />} />
 
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </div>
     </div>
   );
 }
