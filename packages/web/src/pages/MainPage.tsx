@@ -36,7 +36,7 @@ const MainPage = () => {
         <div className="flex gap-[16px]">
           <a
             className="flex-1 hover:cursor-pointer overflow-hidden rounded-[16px]"
-            href="/game/btypoe-trap/"
+            href="/game/typo-trap/"
             target="_self"
           >
             <img
@@ -45,12 +45,8 @@ const MainPage = () => {
               className="w-full h-auto hover:scale-110 transition-all duration-300"
             />
           </a>
-          <div className="flex-1 hover:cursor-pointer overflow-hidden rounded-[16px] border-[#4A5256] border-[1px]">
-            <img
-              src="/commingsoon.png"
-              alt="commingsoon"
-              className="w-full h-auto hover:scale-110 transition-all duration-300"
-            />
+          <div className="flex-1 overflow-hidden rounded-[16px] border-[#4A5256] border-[1px]">
+            <img src="/commingsoon.png" alt="commingsoon" className="w-full" />
           </div>
         </div>
       </div>
