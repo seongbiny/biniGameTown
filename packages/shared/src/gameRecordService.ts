@@ -32,7 +32,7 @@ export interface GameResultPayload {
 export const submitGameResult = (
   gameName: GameId,
   score: number,
-  difficulty: string = "normal"
+  difficulty: string = "normal",
 ): void => {
   try {
     const payload: GameResultPayload = {
@@ -47,7 +47,7 @@ export const submitGameResult = (
         type: "BGT_GAME_RESULT",
         payload,
       },
-      "*" // 개발 환경에서는 "*", 프로덕션에서는 특정 origin 권장
+      "*", // 개발 환경에서는 "*", 프로덕션에서는 특정 origin 권장
     );
 
     console.log("🎮 게임 결과를 부모 창으로 전송:", payload);
