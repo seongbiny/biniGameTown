@@ -5,6 +5,8 @@ import { resolve } from 'path';
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  // 모노레포 루트의 .env.local을 읽도록 설정
+  envDir: resolve(__dirname, '../../'),
   server: {
     port: 3000,
   },

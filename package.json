@@ -18,10 +18,13 @@
     "build:games": "pnpm -r --filter './packages/game/*' build",
     "build:web": "pnpm --filter @bini-game-town/web build",
     "preview": "pnpm --filter @bini-game-town/web preview",
-    "lint": "pnpm -r --parallel run lint"
+    "lint": "pnpm -r --parallel run lint",
+    "test:e2e": "pnpm exec playwright test",
+    "test:e2e:ui": "pnpm exec playwright test --ui"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
+    "@playwright/test": "^1.59.1",
     "concurrently": "^9.2.1",
     "eslint": "^9.23.0",
     "eslint-config-prettier": "^10.1.8",

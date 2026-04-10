@@ -1,29 +1,13 @@
-import { supabase } from '../utils/supabaseClient';
+import { submitGameResult as postGameResult } from '@bini-game-town/shared';
 
-export const submitGameResult = async (stage: number) => {
-  try {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      console.log('사용자가 로그인되어 있지 않아 결과를 저장할 수 없습니다.');
-      return;
-    }
-
-    const record = {
-      user_id: user.id,
-      game_name: 'bini-puzzle',
-      score: stage,
-    };
-
-    const { error } = await supabase.from('scores').insert(record);
-
-    if (error) {
-      console.error('게임 결과 저장 실패:', error);
-      throw error;
-    }
-  } catch (error) {
-    console.error('게임 결과 전송 중 예외 발생:', error);
-  }
+/**
+ * bini-puzzle 게임 결과를 부모 창(웹)으로 전송합니다.
+ *
+ * 내부적으로 shared의 submitGameResult(postMessage)를 사용하므로
+ * 다른 게임들과 동일한 방식으로 점수가 저장됩니다.
+ *
+ * @param moves - 퍼즐 완성까지의 이동 횟수
+ */
+export const submitGameResult = (moves: number): void => {
+  postGameResult('bini-puzzle', moves);
 };

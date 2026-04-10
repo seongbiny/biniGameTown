@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
+import { gamesById } from "@/config/games";
+import type { GameId } from "@/config/games";
 
 interface RankEntry {
   score: number;
@@ -13,10 +15,15 @@ function RankingPage() {
   const [ranking, setRanking] = useState<RankEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [game, setGame] = useState("");
+  const [game, setGame] = useState<GameId | null>(null);
 
   useEffect(() => {
-    const fetchRanking = async () => {
+    if (!game) {
+      setLoading(false);
+      return;
+    }
+
+    const fetchRanking = async (gameId: GameId) => {
       setLoading(true);
       setError(null);
 
@@ -24,7 +31,7 @@ function RankingPage() {
         const { data, error } = await supabase
           .from("scores")
           .select("score, profiles(user_name, avatar_url)")
-          .eq("game_name", game)
+          .eq("game_name", gameId)
           .order("score", { ascending: false })
           .limit(100);
 
@@ -32,17 +39,6 @@ function RankingPage() {
           console.error("Error fetching ranking:", error);
           setError("랭킹을 불러오는 데 실패했습니다.");
         } else {
-          // ✅ console.log 추가
-          console.log("📊 랭킹 데이터 조회 성공:", data);
-          console.log("📊 게임:", game);
-          console.log("📊 총 랭킹 수:", data.length);
-          data.forEach((entry, index) => {
-            console.log(
-              `  ${index + 1}위: ${
-                entry.profiles?.user_name || "알 수 없음"
-              } - ${entry.score}점`
-            );
-          });
           setRanking(data);
         }
       } catch (err) {
@@ -53,20 +49,18 @@ function RankingPage() {
       }
     };
 
-    if (game) {
-      fetchRanking();
-    } else {
-      setLoading(false);
-    }
+    fetchRanking(game);
   }, [game]);
 
   return (
     <div className="h-screen flex flex-col bg-white">
       <h1>게임 랭킹</h1>
       <div>
-        <button onClick={() => setGame("bini-puzzle")}>bini-puzzle</button>
-        <button onClick={() => setGame("flappy-plane")}>flappy-plane</button>
-        <button onClick={() => setGame("typo-trap")}>typo-trap</button>
+        {Object.values(gamesById).map((g) => (
+          <button key={g.id} onClick={() => setGame(g.id)}>
+            {g.title}
+          </button>
+        ))}
       </div>
 
       {loading && <p>Loading...</p>}

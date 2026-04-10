@@ -1,11 +1,9 @@
 import { useAuthStore } from "../stores/authStore";
 import Header from "../components/header/Header";
-import BiniPuzzleLogo from "@/assets/image/biniPuzzleLogo.svg";
-import flappyPlaneLogo from "@/assets/image/flappyPlaneLogo.svg";
-import typoTrapLogo from "@/assets/image/typoTrapLogo.svg";
 
 import { useEffect, useState } from "react";
 import Panel from "@/components/panel/Panel";
+import { gamesById } from "@/config/games";
 import type { GameId } from "@/config/games";
 
 import { motion, LayoutGroup } from "framer-motion";
@@ -56,48 +54,23 @@ const MainPage = () => {
 
             <LayoutGroup>
               <div className="flex flex-wrap gap-[24px]">
-                <motion.img
-                  layout
-                  src={BiniPuzzleLogo}
-                  alt="Bini Puzzle"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleGameSelect("bini-puzzle");
-                  }}
-                  className={`
-                  cursor-pointer transition-opacity hover:opacity-100
-                  ${imageSizeClass}
-                  ${imageFadeClass("bini-puzzle")}
-                `}
-                />
-                <motion.img
-                  layout
-                  src={flappyPlaneLogo}
-                  alt="Flappy Plane"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleGameSelect("flappy-plane");
-                  }}
-                  className={`
-                cursor-pointer transition-opacity hover:opacity-100
-                  ${imageSizeClass}
-                  ${imageFadeClass("flappy-plane")}
-                `}
-                />
-                <motion.img
-                  layout
-                  src={typoTrapLogo}
-                  alt="Typo Trap"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleGameSelect("typo-trap");
-                  }}
-                  className={`
-                cursor-pointer transition-opacity hover:opacity-100
-                  ${imageSizeClass}
-                  ${imageFadeClass("typo-trap")}
-                `}
-                />
+                {Object.values(gamesById).map((game) => (
+                  <motion.img
+                    key={game.id}
+                    layout
+                    src={game.logo}
+                    alt={game.title}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleGameSelect(game.id);
+                    }}
+                    className={`
+                      cursor-pointer transition-opacity hover:opacity-100
+                      ${imageSizeClass}
+                      ${imageFadeClass(game.id)}
+                    `}
+                  />
+                ))}
               </div>
             </LayoutGroup>
           </div>

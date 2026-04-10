@@ -16,6 +16,7 @@ const Panel = ({ selectedGame, isOpen }: PanelProps) => {
 
   return (
     <div
+      data-testid="game-panel"
       className={`
       w-[627px] p-[16px] rounded-[32px] border border-[#4A5256] bg-[#1B1B1B]
       transform transition-transform duration-300 ease-out
