@@ -13,7 +13,9 @@ export default defineConfig({
 
   build: {
     outDir: resolve(__dirname, '../../dist'),
-    emptyOutDir: true,
+    // dist/가 packages/web/ 밖에 있으므로 Vite 기본값은 emptyOutDir: false.
+    // 게임 빌드 결과물(dist/game/*)을 보존하기 위해 명시적으로 false 지정.
+    emptyOutDir: false,
   },
   resolve: {
     alias: {

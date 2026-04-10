@@ -13,7 +13,7 @@
     "dev:puzzle": "pnpm --filter @bini-game-town/bini-puzzle dev",
     "dev:flappy": "pnpm --filter @bini-game-town/flappy-plane dev",
     "dev:typo": "pnpm --filter @bini-game-town/typo-trap dev",
-    "prebuild": "mkdir -p dist/game/bini-puzzle dist/game/flappy-plane dist/game/typo-trap",
+    "prebuild": "rm -rf dist && mkdir -p dist/game/bini-puzzle dist/game/flappy-plane dist/game/typo-trap",
     "build": "pnpm build:games && pnpm build:web",
     "build:games": "pnpm -r --filter './packages/game/*' build",
     "build:web": "pnpm --filter @bini-game-town/web build",
