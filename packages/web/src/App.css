@@ -1,9 +1,0 @@
-@import 'tailwindcss';
-
-.App {
-  /* 원하면 배경 유지 */
-  background: #121212;
-
-  /* 완전 기본처럼 하고 싶으면 이것도 빼도 됨 */
-  min-height: 100vh;
-}

@@ -1,41 +1,21 @@
 {
-  "name": "bini-game-town",
+  "name": "biniverse",
   "private": true,
-  "version": "1.0.0",
-  "main": "index.js",
-  "repository": "git@github.com-sb:seongbiny/biniGameTown.git",
-  "author": "seongbiny <s30ngb1n@gmail.com>",
-  "license": "MIT",
+  "version": "0.0.0",
   "packageManager": "pnpm@9.15.4",
   "scripts": {
-    "dev": "concurrently -n web,puzzle,flappy,typo \"pnpm dev:web\" \"pnpm dev:puzzle\" \"pnpm dev:flappy\" \"pnpm dev:typo\"",
-    "dev:web": "pnpm --filter @bini-game-town/web dev",
-    "dev:puzzle": "pnpm --filter @bini-game-town/bini-puzzle dev",
-    "dev:flappy": "pnpm --filter @bini-game-town/flappy-plane dev",
-    "dev:typo": "pnpm --filter @bini-game-town/typo-trap dev",
-    "prebuild": "rm -rf dist && mkdir -p dist/game/bini-puzzle dist/game/flappy-plane dist/game/typo-trap",
-    "build": "pnpm build:games && pnpm build:web",
-    "build:games": "pnpm -r --filter './packages/game/*' build",
-    "build:web": "pnpm --filter @bini-game-town/web build",
-    "preview": "pnpm --filter @bini-game-town/web preview",
-    "lint": "pnpm -r --parallel run lint",
-    "test:e2e": "pnpm exec playwright test",
-    "test:e2e:ui": "pnpm exec playwright test --ui"
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "typecheck": "turbo typecheck",
+    "format": "prettier --write ."
   },
   "devDependencies": {
-    "@eslint/js": "^9.25.0",
-    "@playwright/test": "^1.59.1",
-    "concurrently": "^9.2.1",
-    "eslint": "^9.23.0",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-import": "^2.32.0",
-    "eslint-plugin-jsx-a11y": "^6.10.2",
-    "eslint-plugin-react": "^7.37.5",
-    "eslint-plugin-react-hooks": "^5.2.0",
-    "globals": "^16.0.0",
-    "typescript": "^5.8.2"
-  },
-  "dependencies": {
-    "typescript-eslint": "^8.30.1"
+    "eslint": "^9.0.0",
+    "prettier": "^3.0.0",
+    "turbo": "^2.0.0",
+    "typescript": "^5.0.0",
+    "typescript-eslint": "^8.0.0",
+    "@eslint/js": "^9.0.0"
   }
 }
