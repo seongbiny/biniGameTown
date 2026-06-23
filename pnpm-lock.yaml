@@ -29,6 +29,12 @@ importers:
 
   apps/web:
     dependencies:
+      '@biniverse/bini-puzzle':
+        specifier: workspace:*
+        version: link:../../games/bini-puzzle
+      '@biniverse/flappy-bird':
+        specifier: workspace:*
+        version: link:../../games/flappy-bird
       '@biniverse/game-sdk':
         specifier: workspace:*
         version: link:../../packages/game-sdk
@@ -63,6 +69,31 @@ importers:
       vite:
         specifier: ^6.0.0
         version: 6.4.3(jiti@2.7.0)(lightningcss@1.32.0)
+
+  games/bini-puzzle:
+    dependencies:
+      '@biniverse/game-sdk':
+        specifier: workspace:*
+        version: link:../../packages/game-sdk
+      pixi.js:
+        specifier: ^8.0.0
+        version: 8.19.0
+
+  games/flappy-bird:
+    dependencies:
+      '@biniverse/game-sdk':
+        specifier: workspace:*
+        version: link:../../packages/game-sdk
+      matter-js:
+        specifier: ^0.20.0
+        version: 0.20.0
+      pixi.js:
+        specifier: ^8.0.0
+        version: 8.19.0
+    devDependencies:
+      '@types/matter-js':
+        specifier: ^0.20.2
+        version: 0.20.2
 
   games/typo-trap:
     dependencies:
@@ -662,6 +693,9 @@ packages:
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
 
+  '@types/matter-js@0.20.2':
+    resolution: {integrity: sha512-3PPKy3QxvZ89h9+wdBV2488I1JLVs7DEpIkPvgO8JC1mUdiVSO37ZIvVctOTD7hIq8OAL2gJ3ugGSuUip6DhCw==}
+
   '@types/react-dom@19.2.3':
     resolution: {integrity: sha512-jp2L/eY6fn+KgVVQAOqYItbF0VY/YApe5Mz2F0aykSO8gx31bYCZyvSeYxCHKvzHG5eZjc+zyaS5BrBWya2+kQ==}
     peerDependencies:
@@ -1121,6 +1155,9 @@ packages:
 
   magic-string@0.30.21:
     resolution: {integrity: sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ==}
+
+  matter-js@0.20.0:
+    resolution: {integrity: sha512-iC9fYR7zVT3HppNnsFsp9XOoQdQN2tUyfaKg4CHLH8bN+j6GT4Gw7IH2rP0tflAebrHFw730RR3DkVSZRX8hwA==}
 
   minimatch@10.2.5:
     resolution: {integrity: sha512-MULkVLfKGYDFYejP07QOurDLLQpcjk7Fw+7jXS2R2czRQzR56yHRveU5NDJEOviH+hETZKSkIk5c+T23GjFUMg==}
@@ -1843,6 +1880,8 @@ snapshots:
 
   '@types/json-schema@7.0.15': {}
 
+  '@types/matter-js@0.20.2': {}
+
   '@types/react-dom@19.2.3(@types/react@19.2.17)':
     dependencies:
       '@types/react': 19.2.17
@@ -2308,6 +2347,8 @@ snapshots:
   magic-string@0.30.21:
     dependencies:
       '@jridgewell/sourcemap-codec': 1.5.5
+
+  matter-js@0.20.0: {}
 
   minimatch@10.2.5:
     dependencies:

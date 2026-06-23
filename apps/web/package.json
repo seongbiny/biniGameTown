@@ -11,6 +11,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@biniverse/bini-puzzle": "workspace:*",
+    "@biniverse/flappy-bird": "workspace:*",
     "@biniverse/game-sdk": "workspace:*",
     "@biniverse/typo-trap": "workspace:*",
     "react": "^19.0.0",

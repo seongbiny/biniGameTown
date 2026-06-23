@@ -1,0 +1,22 @@
+{
+  "name": "@biniverse/bini-puzzle",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@biniverse/game-sdk": "workspace:*",
+    "pixi.js": "^8.0.0"
+  }
+}

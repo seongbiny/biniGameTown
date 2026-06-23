@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450">
+  <rect width="800" height="450" fill="#87ceeb"/>
+  <rect x="60" y="60" width="680" height="330" rx="16" fill="#5bb8f5"/>
+  <!-- 파이프 왼쪽 -->
+  <rect x="160" y="60" width="60" height="160" rx="4" fill="#4caf50"/>
+  <rect x="150" y="210" width="80" height="24" rx="4" fill="#388e3c"/>
+  <!-- 파이프 오른쪽 위 -->
+  <rect x="560" y="60" width="60" height="120" rx="4" fill="#4caf50"/>
+  <rect x="550" y="170" width="80" height="24" rx="4" fill="#388e3c"/>
+  <!-- 파이프 오른쪽 아래 -->
+  <rect x="560" y="290" width="60" height="100" rx="4" fill="#4caf50"/>
+  <rect x="550" y="282" width="80" height="24" rx="4" fill="#388e3c"/>
+  <!-- 새 -->
+  <rect x="310" y="210" width="44" height="34" rx="10" fill="#ffd600"/>
+  <circle cx="346" cy="216" r="6" fill="#fff"/>
+  <circle cx="348" cy="215" r="3" fill="#333"/>
+  <polygon points="354,222 366,218 354,226" fill="#ff6f00"/>
+  <!-- 텍스트 -->
+  <text x="400" y="370" font-family="Arial, sans-serif" font-size="52" font-weight="bold" fill="#1a237e" text-anchor="middle">Flappy Bird</text>
+  <text x="400" y="408" font-family="Arial, sans-serif" font-size="22" fill="#1565c0" text-anchor="middle">아케이드 · 반응속도</text>
+</svg>
