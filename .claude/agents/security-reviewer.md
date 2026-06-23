@@ -10,6 +10,7 @@ model: opus
 ## 검사 항목
 
 ### 치명적 (Critical)
+
 - 하드코딩된 시크릿/자격 증명
 - SQL 인젝션
 - 명령어 인젝션
@@ -17,6 +18,7 @@ model: opus
 - 인증 우회
 
 ### 높음 (High)
+
 - XSS (Cross-Site Scripting)
 - CSRF (Cross-Site Request Forgery)
 - 안전하지 않은 역직렬화
@@ -24,6 +26,7 @@ model: opus
 - 취약한 의존성
 
 ### 중간 (Medium)
+
 - 부적절한 입력 검증
 - 세션 관리 문제
 - 로깅에 민감 정보 포함

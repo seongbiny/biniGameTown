@@ -35,14 +35,14 @@ pnpm format       # Prettier 포맷팅
 
 ## 기술 스택
 
-| 영역 | 기술 |
-|------|------|
-| 모노레포 | pnpm Workspace + Turborepo |
-| 웹 포털 | React 19 + Vite + Tailwind CSS |
-| 게임 엔진 | Pixi.js 8 |
-| 백엔드 | Supabase |
-| 배포 | Vercel |
-| 언어 | TypeScript 5 |
+| 영역      | 기술                           |
+| --------- | ------------------------------ |
+| 모노레포  | pnpm Workspace + Turborepo     |
+| 웹 포털   | React 19 + Vite + Tailwind CSS |
+| 게임 엔진 | Pixi.js 8                      |
+| 백엔드    | Supabase                       |
+| 배포      | Vercel                         |
+| 언어      | TypeScript 5                   |
 
 ## 코딩 규칙
 

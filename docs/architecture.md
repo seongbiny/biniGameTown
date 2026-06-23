@@ -49,7 +49,7 @@ React 19 + Vite 기반 웹 포털. 사용자가 게임을 탐색하고 실행하
 
 ---
 
-## games/*
+## games/\*
 
 각 게임은 독립 패키지로 존재하며, `GameModule` 인터페이스를 export한다.
 
@@ -149,10 +149,10 @@ URL 진입 (/games/typo-trap/play)
 
 ## 기술 스택
 
-| 영역 | 기술 |
-|------|------|
-| 모노레포 | pnpm Workspace + Turborepo |
-| 웹 포털 | React 19 + Vite + Tailwind CSS |
-| 게임 엔진 | Pixi.js 8 |
-| 배포 | Vercel |
-| 언어 | TypeScript 5 |
+| 영역      | 기술                           |
+| --------- | ------------------------------ |
+| 모노레포  | pnpm Workspace + Turborepo     |
+| 웹 포털   | React 19 + Vite + Tailwind CSS |
+| 게임 엔진 | Pixi.js 8                      |
+| 배포      | Vercel                         |
+| 언어      | TypeScript 5                   |

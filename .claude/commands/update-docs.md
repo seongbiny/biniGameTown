@@ -32,6 +32,7 @@ allowed-tools: Read, Write, Edit, Grep, Glob
 ## 진실의 소스
 
 문서는 다음에서 생성됩니다:
+
 - package.json - 스크립트, 설명
 - .env.example - 환경 변수
 - 코드 주석 - JSDoc, TSDoc

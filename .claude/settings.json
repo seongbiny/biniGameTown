@@ -1,11 +1,5 @@
 {
   "permissions": {
-    "allow": [
-      "Bash(pnpm *)",
-      "Bash(npm *)",
-      "Bash(git *)",
-      "Bash(ls *)",
-      "Bash(cat *)"
-    ]
+    "allow": ["Bash(pnpm *)", "Bash(npm *)", "Bash(git *)", "Bash(ls *)", "Bash(cat *)"]
   }
 }

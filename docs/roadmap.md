@@ -8,13 +8,13 @@
 
 ## 전체 개발 단계 개요
 
-| Phase | 이름 | 상태 | 목표 |
-|-------|------|------|------|
+| Phase   | 이름                      | 상태       | 목표                                                    |
+| ------- | ------------------------- | ---------- | ------------------------------------------------------- |
 | Phase 1 | MVP — 게임 포털 기반 구축 | 🟡 진행 중 | Typo Trap을 시작으로 미니게임을 한 곳에서 탐색하고 실행 |
-| Phase 2 | 랭킹 시스템 | 🔜 대기 | Supabase + 소셜 로그인 + 점수 저장 |
-| Phase 3 | 성능 최적화 | 🔜 대기 | Lazy loading 고도화, Lighthouse 개선, 메모리 누수 점검 |
-| Phase 4 | 모바일 앱 | 🔜 대기 | React Native / Expo, WebView 기반 게임 플레이 |
-| Phase 5 | 어드민 | 🔜 대기 | 게임 관리, 랭킹 데이터 조회, 공지 관리 |
+| Phase 2 | 랭킹 시스템               | 🔜 대기    | Supabase + 소셜 로그인 + 점수 저장                      |
+| Phase 3 | 성능 최적화               | 🔜 대기    | Lazy loading 고도화, Lighthouse 개선, 메모리 누수 점검  |
+| Phase 4 | 모바일 앱                 | 🔜 대기    | React Native / Expo, WebView 기반 게임 플레이           |
+| Phase 5 | 어드민                    | 🔜 대기    | 게임 관리, 랭킹 데이터 조회, 공지 관리                  |
 
 ---
 
@@ -55,6 +55,7 @@
   - 담당 파일: `packages/game-sdk/`
   - 완료 기준: `pnpm --filter @biniverse/game-sdk build`가 성공한다
 - [ ] **[TASK-007]** 공유 타입 정의 — `GameMeta`, `GameInstance`, `GameModule`
+
   ```ts
   export interface GameMeta {
     id: string;
@@ -80,6 +81,7 @@
   ```
   - 담당 파일: `packages/game-sdk/src/types.ts`
   - 완료 기준: 다른 패키지에서 `@biniverse/game-sdk`로 import된다
+
 - [ ] **[TASK-008]** `GameRegistry` 구현 — 게임 등록 및 조회
   - 담당 파일: `packages/game-sdk/src/registry.ts`
   - 상세: `GameModule[]` 배열로 게임 목록을 관리하고 `getGameById(id: string)` 함수로 조회 — 싱글톤 없이 배열 + 순수 함수로 단순하게 구성
@@ -276,10 +278,10 @@ postMessage 프로토콜은 Phase 2 (랭킹 시스템) 단계에서 별도로 �
 
 ### packages/game-sdk vs apps/web 역할 분리
 
-| 패키지 | 역할 | React 의존 |
-|--------|------|-----------|
+| 패키지              | 역할                                                                 | React 의존             |
+| ------------------- | -------------------------------------------------------------------- | ---------------------- |
 | `packages/game-sdk` | 공유 타입(`GameMeta`, `GameInstance`, `GameModule`) + `GameRegistry` | 없음 (순수 TypeScript) |
-| `apps/web` | `GamePlayer` React 컴포넌트 — `useEffect`로 게임 생명주기 관리 | 있음 |
+| `apps/web`          | `GamePlayer` React 컴포넌트 — `useEffect`로 게임 생명주기 관리       | 있음                   |
 
 `packages/types`는 Phase 1 MVP 범위에서 보류한다. 공유 타입은 `packages/game-sdk/src/types.ts`에서 관리하며, 별도 패키지 분리가 필요한 시점에 재검토한다.
 
@@ -323,20 +325,20 @@ postMessage 프로토콜은 Phase 2 (랭킹 시스템) 단계에서 별도로 �
 
 ## 진행 추적
 
-| Phase | 상태 | 시작일 | 완료일 | 비고 |
-|-------|------|--------|--------|------|
-| Phase 1 | 🟡 진행 중 | 2026-06-23 | - | 모노레포 뼈대 완료 |
-| Phase 2 | 🔜 대기 | - | - | |
-| Phase 3 | 🔜 대기 | - | - | |
-| Phase 4 | 🔜 대기 | - | - | |
-| Phase 5 | 🔜 대기 | - | - | |
+| Phase   | 상태       | 시작일     | 완료일 | 비고               |
+| ------- | ---------- | ---------- | ------ | ------------------ |
+| Phase 1 | 🟡 진행 중 | 2026-06-23 | -      | 모노레포 뼈대 완료 |
+| Phase 2 | 🔜 대기    | -          | -      |                    |
+| Phase 3 | 🔜 대기    | -          | -      |                    |
+| Phase 4 | 🔜 대기    | -          | -      |                    |
+| Phase 5 | 🔜 대기    | -          | -      |                    |
 
 ---
 
 ## 변경 이력
 
-| 날짜 | 버전 | 변경 내용 | 작성자 |
-|------|------|----------|--------|
-| 2026-06-23 | v1.0.0 | 최초 작성 | Claude |
-| 2026-06-23 | v1.1.0 | MVP 범위 조정 — GameDifficulty 제거, packages/types 보류, game-sdk 역할 명확화, postMessage Phase 2 보류, 게임 이식 순서 조정, learning-log 추가 | Claude |
+| 날짜       | 버전   | 변경 내용                                                                                                                                                                                        | 작성자 |
+| ---------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------ |
+| 2026-06-23 | v1.0.0 | 최초 작성                                                                                                                                                                                        | Claude |
+| 2026-06-23 | v1.1.0 | MVP 범위 조정 — GameDifficulty 제거, packages/types 보류, game-sdk 역할 명확화, postMessage Phase 2 보류, 게임 이식 순서 조정, learning-log 추가                                                 | Claude |
 | 2026-06-23 | v1.2.0 | GameModule.id 제거, GameRegistry를 배열+함수로 단순화, game-sdk에서 vite.config.ts 제거, games.ts를 gameModules.ts 등록 파일로 변경, React Concurrent 문구 제거, Phase 1A/1B 중간 완료 기준 추가 | Claude |

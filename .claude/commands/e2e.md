@@ -34,11 +34,13 @@ npx playwright show-report
 ## 모범 사례
 
 **해야 할 것:**
+
 - Page Object Model 사용
 - data-testid 속성 사용
 - 임의의 타임아웃 대신 API 응답 대기
 
 **하지 말아야 할 것:**
+
 - 불안정한 선택자 사용 (CSS 클래스)
 - 프로덕션에서 테스트 실행
 - 불안정한 테스트 무시
