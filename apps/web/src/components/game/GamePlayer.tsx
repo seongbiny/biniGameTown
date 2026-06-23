@@ -22,22 +22,34 @@ export default function GamePlayer({ gameId }: GamePlayerProps) {
     }
 
     let instance: GameInstance | null = null;
+    let destroyed = false;
 
     const start = async () => {
       try {
-        instance = module.createGame();
-        await instance.init(container);
+        const newInstance = module.createGame();
+        await newInstance.init(container);
+
+        if (destroyed) {
+          // cleanup이 init보다 먼저 실행된 경우 — 완전히 초기화된 앱을 즉시 정리
+          newInstance.destroy();
+          return;
+        }
+
+        instance = newInstance;
         instance.start();
         setIsLoading(false);
       } catch {
-        setError('게임을 불러오는 중 오류가 발생했습니다.');
-        setIsLoading(false);
+        if (!destroyed) {
+          setError('게임을 불러오는 중 오류가 발생했습니다.');
+          setIsLoading(false);
+        }
       }
     };
 
     void start();
 
     return () => {
+      destroyed = true;
       instance?.destroy();
     };
   }, [gameId]);
