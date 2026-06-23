@@ -11,32 +11,26 @@ biniverse/
 │   ├── typo-trap/
 │   ├── flappy-bird/
 │   └── bini-puzzle/
-└── packages/         # 공유 라이브러리
-    ├── game-sdk/     # 게임 실행 인터페이스 및 레지스트리
-    ├── types/        # 공유 TypeScript 타입
-    ├── ui/           # 공유 UI 컴포넌트
-    └── utils/        # 공유 유틸리티
+└── packages/
+    └── game-sdk/     # 공유 타입 및 게임 레지스트리
 ```
+
+> `packages/types`, `packages/ui`, `packages/utils`는 Phase 1 MVP 범위에서 보류.
+> 공유 타입은 `packages/game-sdk/src/types.ts`에서 관리한다.
 
 ---
 
 ## 왜 모노레포인가?
 
-게임 패키지, 웹 포털, 공유 SDK가 서로 다른 패키지로 분리되어 있지만 하나의 저장소에서 함께 관리해야 하는 이유가 있다.
-
-- **게임과 웹이 같은 타입을 공유한다**: `GameMeta`, `GameInstance` 등을 별도 npm 패키지로 배포하지 않고 로컬에서 바로 참조할 수 있다.
-- **의존성을 일괄 관리한다**: pnpm workspace로 중복 설치를 줄이고, Turborepo로 변경된 패키지만 빌드한다.
-- **게임 추가 확장이 쉽다**: 새 게임을 `games/` 아래에 추가하고 `GameModule`을 export하면 웹 포털에서 바로 인식된다.
+- **타입 공유**: `GameMeta`, `GameInstance` 등을 로컬에서 직접 참조하며 npm 배포 없이 타입 안전성을 유지한다.
+- **의존성 일괄 관리**: pnpm workspace로 중복 설치를 줄이고 Turborepo로 변경된 패키지만 빌드한다.
+- **게임 확장**: `games/` 아래에 새 패키지를 추가하고 `GameModule`을 export하면 웹 포털에서 바로 인식된다.
 
 ---
 
 ## apps/web
 
 React 19 + Vite 기반 웹 포털. 사용자가 게임을 탐색하고 실행하는 진입점이다.
-
-- 홈 / 게임 목록 / 게임 상세 / 게임 실행 4개 화면을 제공한다.
-- `GameRegistry`에서 게임 목록을 읽어 렌더링한다.
-- `GamePlayer` 컴포넌트로 게임 생명주기를 관리한다.
 
 라우트 구조:
 
@@ -47,51 +41,71 @@ React 19 + Vite 기반 웹 포털. 사용자가 게임을 탐색하고 실행하
 /games/:id/play → 게임 실행
 ```
 
+### 게임 등록 흐름
+
+`apps/web/src/gameModules.ts`에서 게임 패키지를 import해 배열로 구성하고,
+`main.tsx`에서 렌더링 전에 `registerGames(modules)`를 호출해 레지스트리에 등록한다.
+
+```ts
+// apps/web/src/main.tsx
+import { registerGames } from '@biniverse/game-sdk';
+import gameModules from './gameModules';
+
+registerGames(gameModules);
+createRoot(rootElement).render(<App />);
+```
+
+### GamePlayer 컴포넌트
+
+게임 실행 화면(`/games/:id/play`)에 마운트되며 `useEffect`로 게임 생명주기를 관리한다.
+
+```ts
+useEffect(() => {
+  let instance: GameInstance | null = null;
+  const start = async () => {
+    instance = module.createGame();
+    await instance.init(container);
+    instance.start();
+  };
+  void start();
+  return () => { instance?.destroy(); };  // cleanup: 페이지 이탈 시 리소스 해제
+}, [gameId]);
+```
+
 ---
 
 ## games/\*
 
-각 게임은 독립 패키지로 존재하며, `GameModule` 인터페이스를 export한다.
-
-- 게임 내부 구현(Pixi.js 로직)은 외부에 노출되지 않는다.
-- `createGame()`으로 인스턴스를 생성하고 `init / start / destroy`로 제어한다.
-- 웹 포털은 게임 구현을 알 필요 없이 인터페이스만 호출한다.
+각 게임은 독립 패키지로 존재하며, `GameModule` 인터페이스를 default export한다.
 
 ```
 games/typo-trap/
 ├── src/
-│   ├── index.ts    # GameModule export
-│   └── ...         # Pixi.js 게임 구현
+│   ├── index.ts          # GameModule export (진입점)
+│   └── game/             # Pixi.js 게임 구현 (외부 비공개)
 ├── package.json
 └── tsconfig.json
 ```
+
+- 빌드 도구: `tsc` (타입 선언 생성용). Vite는 사용하지 않는다.
+- 번들링은 `apps/web`의 Vite가 담당한다.
+- `init / start / destroy` 외의 내부 구현은 외부에 노출되지 않는다.
 
 ---
 
 ## packages/game-sdk
 
-게임과 웹 포털 사이의 공통 인터페이스를 제공한다.
+게임과 웹 포털 사이의 공통 인터페이스와 레지스트리를 제공하는 순수 TypeScript 패키지.
+React에 의존하지 않는다.
 
-- **`GameRegistry`**: 게임 목록을 등록하고 id로 조회하는 싱글톤
-- **`GamePlayer` 로직**: `init → start → destroy` 생명주기 관리
-
-> Phase 2에서는 `submitGameResult` (점수 전송)가 추가될 예정이다.
-
----
-
-## packages/types
-
-프로젝트 전체에서 공유하는 TypeScript 타입을 정의한다.
+### 타입 (`src/types.ts`)
 
 ```ts
-export type GameDifficulty = 'easy' | 'normal' | 'hard';
-
 export interface GameMeta {
   id: string;
   title: string;
   description: string;
   categories: string[];
-  difficulty: GameDifficulty;
   thumbnail: string;
   controls: string[];
 }
@@ -105,45 +119,59 @@ export interface GameInstance {
 }
 
 export interface GameModule {
-  id: string;
   meta: GameMeta;
   createGame: () => GameInstance;
 }
 ```
 
-`any` 타입을 금지하고 이 인터페이스로 게임과 웹 포털 사이의 타입 안전성을 보장한다.
+### 레지스트리 (`src/registry.ts`)
+
+싱글톤 없이 배열 + 순수 함수로 구성한다.
+
+```ts
+const games: GameModule[] = [];
+
+export function registerGames(modules: GameModule[]): void
+export function getGameById(id: string): GameModule | undefined
+export function getAllGames(): GameModule[]
+```
 
 ---
 
 ## 게임 실행 흐름
 
-사용자가 게임 실행 화면(`/games/:id/play`)에 진입하면 아래 순서로 실행된다.
+사용자가 게임 실행 화면에 진입했을 때의 전체 흐름:
 
 ```
 URL 진입 (/games/typo-trap/play)
-  → GameRegistry.getGame('typo-trap') → GameModule 반환
-  → createGame()                       → GameInstance 생성
-  → init(containerElement)             → Pixi.js Application 초기화
-  → start()                            → 게임 루프 시작
+  → getGameById('typo-trap')        → GameModule 반환
+  → module.createGame()             → GameInstance 생성
+  → instance.init(containerElement) → Pixi.js Application 초기화, canvas 삽입
+  → instance.start()                → Ready 화면 표시, 게임 루프 시작
   → [사용자 플레이]
-  → 페이지 이탈 또는 컴포넌트 unmount
-  → destroy()                          → Pixi.js 리소스 해제, 이벤트 리스너 제거
+  → 페이지 이탈 (React useEffect cleanup)
+  → instance.destroy()              → Pixi.js 리소스 해제, 이벤트 리스너 제거
 ```
-
-`GamePlayer` 컴포넌트는 `useEffect`의 cleanup 함수에서 `destroy()`를 호출해 메모리 누수를 방지한다.
 
 ---
 
 ## 게임 이식 순서
 
-기존 완성된 게임을 `GameModule` 형태로 이식할 때 아래 순서를 따른다.
+기존 완성된 게임을 `GameModule` 형태로 이식할 때 따르는 패턴:
 
-1. `games/{game-name}/` 패키지 초기화 (`package.json`, `tsconfig.json`, `vite.config.ts`)
-2. 기존 게임 소스를 `src/` 아래로 이동
-3. Pixi.js Application 생성/해제 코드를 `init()` / `destroy()`로 감싼다
-4. 게임 루프 시작 코드를 `start()`로 감싼다
-5. `src/index.ts`에서 `GameModule` 형태로 export한다
-6. `GameRegistry`에 등록하고 `apps/web`에서 동작 확인
+1. `games/{game-name}/` 패키지 초기화 (`package.json`, `tsconfig.json`)
+2. 기존 소스를 `src/game/` 아래로 복사
+3. `init(container)` — Pixi.js Application 초기화 및 canvas 삽입
+4. `start()` — Ready 화면 표시 (init과 분리)
+5. `destroy()` — ticker 정지, 이벤트 리스너 제거, app.destroy(true)
+6. `src/index.ts`에서 `GameModule`로 export
+7. `apps/web/src/gameModules.ts`에 등록
+
+주의 사항:
+
+- `tsconfig.base.json`의 `noUncheckedIndexedAccess: true` — 배열 직접 인덱스 접근에 `!` 필요
+- `exactOptionalPropertyTypes: true` — Pixi.js의 `Text` 스타일은 `TextStyleOptions` 타입 사용
+- 로컬 `GameInstance` 인터페이스 제거 — `@biniverse/game-sdk`에서 import
 
 ---
 
