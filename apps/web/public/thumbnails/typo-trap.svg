@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450">
+  <rect width="800" height="450" fill="#1a1a2e"/>
+  <rect x="60" y="60" width="680" height="330" rx="16" fill="#16213e"/>
+  <text x="400" y="210" font-family="Arial, sans-serif" font-size="72" font-weight="bold" fill="#ffffff" text-anchor="middle">Typo Trap</text>
+  <text x="400" y="275" font-family="Arial, sans-serif" font-size="28" fill="#aaaacc" text-anchor="middle">오타를 찾아라!</text>
+  <rect x="300" y="310" width="200" height="48" rx="8" fill="#4a90e2"/>
+  <text x="400" y="342" font-family="Arial, sans-serif" font-size="22" fill="#ffffff" text-anchor="middle">타이핑 · 아케이드</text>
+</svg>
